@@ -1,0 +1,9 @@
+CREATE TABLE objects (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  local TEXT NOT NULL,
+  image TEXT, -- optional
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
