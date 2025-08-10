@@ -88,7 +88,7 @@ O **My Memory** é um aplicativo voltado para a organização de objetos pessoai
 
 ---
 
-## Estrutura Sugerida do Projeto
+## Estrutura do Projeto
 
 - **Frontend:** HTML, CSS, JavaScript
 - **Backend:** Node.js + Express 
