@@ -16,7 +16,7 @@ form.addEventListener("submit", function (e) {
     return;
   }
 
-  if (editandoId) {
+  if (editandoId !==null) {
     const objeto = objetos.find(o => o.id === editandoId);
     objeto.nome = nome;
     objeto.local = local;
@@ -76,3 +76,7 @@ function excluirObjeto(id) {
     renderizarObjetos();
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderizarObjetos();
+});

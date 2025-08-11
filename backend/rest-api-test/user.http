@@ -1,0 +1,22 @@
+POST http://localhost:3333/api/users
+Content-Type: application/json
+
+{
+    "name": "Priscila",
+    "email":"priscila89@gmail.com",
+    "password": "123457"
+}
+
+###
+DELETE http://localhost:3333/api/users/9
+
+###
+PUT http://localhost:3333/api/users/4
+Content-Type: application/json
+
+{
+    "name": "Novo Nome",
+    "email": "novoemail@example.com",
+    "password": "novaSenha123"
+}
+

@@ -3,7 +3,7 @@ body {
   padding: 20px;
 }
 
-form {
+.form-com-margem {
   margin-bottom: 20px;
 }
 
@@ -14,8 +14,11 @@ input {
 
 button {
   padding: 8px 12px;
-  margin-left: 5px;
   cursor: pointer;
+}
+
+.button-with-margin {
+  margin-left: 5px;
 }
 
 .objeto {

@@ -1,3 +1,11 @@
+CREATE TABLE users( 
+id SERIAL PRIMARY KEY, 
+name TEXT not null, 
+email TEXT unique not null, 
+password TEXT not null, 
+created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL);
+
+
 CREATE TABLE objects (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
