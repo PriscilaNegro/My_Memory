@@ -8,24 +8,22 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:3333/api/users/11
+PUT http://localhost:3333/api/users/4
 Content-Type: application/json
 
 {
-    "name": "NovoNome Jess10",
-    "email": "novoemai101@example.com",
-    "password": "novaSenha789"
+    "name": "Priscila"
+    
 }
 
 ###
 DELETE http://localhost:3333/api/users/11
 
 ###
-GET http://localhost:3333/api/users/11
+GET http://localhost:3333/api/users/
 
 ### Buscar usuário por nome
-GET http://localhost:3333/api/users/name/NovoNome Jess10
-
+GET http://localhost:3333/api/users/?name=Priscila&email=priscila@gmail.com
 
 ### Buscar usuário por email
-GET http://localhost:3333/api/users/email/priscila@gmail.com
+GET http://localhost:3333/api/users/?email=priscila@gmail.com

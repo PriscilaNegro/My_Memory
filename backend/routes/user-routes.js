@@ -12,10 +12,4 @@ router.route("/:id")
     .put(userController.updateUser)
     .get(userController.getUserById);
 
-    router.route("/name/:name")
-    .get(userController.getUsersByName);
-
-    router.route("/email/:email")
-    .get(userController.getUserByEmail);
-
 export default router;

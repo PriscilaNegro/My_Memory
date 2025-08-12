@@ -49,6 +49,15 @@ export const updateUser = asyncHandler(async (req, res) => {
         throw new Error(`Usuário com ID ${id} não encontrado`);
     }
 
+     if (email) {
+        const emailLower = email.toLowerCase();
+        const userWithEmail = await UserModel.findByEmail(emailLower);
+        if (userWithEmail && userWithEmail.id != id) {
+            res.status(400);
+            throw new Error("Este email já está sendo usado por outro usuário!");
+        }
+    }
+
     const updateData = { id };
 
     if (name !== undefined) updateData.name = name;
@@ -84,14 +93,6 @@ export const deleteUser = asyncHandler(async (req,res) => {
 
 });
 
-//@desc     Get all users
-//@route    GET /users
-//@access   Public
-export const getUsers = asyncHandler(async (req, res) => {
-    const users = await UserModel.findAll();
-    res.status(200).json(users);
-});
-
 //@desc     Get user by id
 //@route    GET /users/:id
 //@access   Public
@@ -105,29 +106,43 @@ export const getUserById = asyncHandler(async (req, res) => {
     res.status(200).json(user);
 });
 
-//@desc     Get user by name
-//@route    GET /users/name/:name
+//@desc     Get users (all, by name, or by email)
+//@route    GET /users
 //@access   Public
-export const getUsersByName = asyncHandler(async (req, res) => {
-    const { name } = req.params;
-    const users = await UserModel.findByName(name);
-    if (!users || users.length === 0) {
-        res.status(404);
-        throw new Error(`Usuário com nome "${name}" não encontrado`);
+export const getUsers = asyncHandler(async (req, res) => {
+    const { name, email } = req.query;
+
+     if (name && email) {
+        const users = await UserModel.findByNameAndEmail(name, email);
+        if (!users || users.length === 0) {
+            res.status(404);
+            throw new Error(`Nenhum usuário encontrado com nome "${name}" e email "${email}"`);
+        }
+        return res.status(200).json(users);
     }
-    res.status(200).json(users);
+    
+    if (name) {
+        const users = await UserModel.findByName(name);
+        if (!users || users.length === 0) {
+            res.status(404);
+            throw new Error(`Usuário com nome "${name}" não encontrado`);
+        }
+        return res.status(200).json(users);
+    }
+
+    if (email) {
+        const user = await UserModel.findByEmail(email);
+        if (!user) {
+            res.status(404);
+            throw new Error(`Usuário com email "${email}" não encontrado`);
+        }
+        return res.status(200).json(user);
+    }
+
+    // Se não veio nome nem email, retorna todos
+    const allUsers = await UserModel.findAll();
+    res.status(200).json(allUsers);
 });
 
-//@desc     Get user by email
-//@route    GET /users/email/:email
-//@access   Public
-export const getUserByEmail = asyncHandler(async (req, res) => {
-    const { email } = req.params;
-    const user = await UserModel.findByEmail(email);
-    if (!user) {
-        res.status(404);
-        throw new Error(`Usuário com email "${email}" não encontrado`);
-    }
-    res.status(200).json(user);
-});
+
 

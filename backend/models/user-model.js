@@ -40,6 +40,17 @@ const UserModel ={
         return result.rows[0];
     },
 
+    async findByNameAndEmail(name, email) {
+        const nameSearch = `%${name.toLowerCase()}%`;
+        const emailLower = email.toLowerCase();
+    
+        const result = await pool.query(
+        `select * from users where lower(name) like $1 and lower(email) = $2`,
+        [nameSearch, emailLower]
+    );
+    return result.rows;
+},
+
     async findAll() {
         const result = await pool.query(
             `select * from users`);
@@ -51,15 +62,15 @@ const UserModel ={
         const values = [];
         let index = 1;
 
-    if (name !== undefined) {
+    if (name) {
         fields.push(`name = $${index++}`);
         values.push(name);
     }
-    if (email !== undefined) {
+    if (email) {
         fields.push(`email = $${index++}`);
-        values.push(email.toLowerCase());
+        values.push(email); // já vem em lowercase do controller
     }
-    if (passwordHash !== undefined) {
+    if (passwordHash) {
         fields.push(`password = $${index++}`);
         values.push(passwordHash);
     }
@@ -69,6 +80,7 @@ const UserModel ={
     }
 
     values.push(id);
+
     const result = await pool.query(
         `update users set ${fields.join(", ")} 
          where id = $${index} returning *`,
