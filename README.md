@@ -12,7 +12,6 @@ O **My Memory** é um aplicativo voltado para a organização de objetos pessoai
 - Busca de objetos por nome ou local
 - Autenticação com JWT
 - Interface simples e intuitiva
-- (Futuro) Dashboard com estatísticas de uso
 
 ---
 
