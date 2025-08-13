@@ -1,7 +1,7 @@
 import express from "express";
 import "dotenv/config"
 import objectsRoutes from "./routes/object-routes.js"
-import { errorHandler } from "./middleware/error-handler.js";
+import { errorHandler, notFound } from "./middleware/error-handler.js";
 import userRoutes from "./routes/user-routes.js";
 
 const app = express();
@@ -14,6 +14,7 @@ app.use("/api/objects",objectsRoutes);
 app.use("/api/users",userRoutes);
 
 //middleware
+app.use(notFound);
 app.use(errorHandler);
 
 app.listen(PORT,()=>{

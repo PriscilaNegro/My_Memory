@@ -2,21 +2,28 @@ POST http://localhost:3333/api/users
 Content-Type: application/json
 
 {
-    "name": "Priscila",
-    "email":"priscila89@gmail.com",
-    "password": "123457"
+    "name": "Jessica",
+    "email":"jessica@gmail.com",
+    "password": "123456"
 }
-
-###
-DELETE http://localhost:3333/api/users/9
 
 ###
 PUT http://localhost:3333/api/users/4
 Content-Type: application/json
 
 {
-    "name": "Novo Nome",
-    "email": "novoemail@example.com",
-    "password": "novaSenha123"
+    "name": "Priscila"
+    
 }
 
+###
+DELETE http://localhost:3333/api/users/11
+
+###
+GET http://localhost:3333/api/users/
+
+### Buscar usuário por nome
+GET http://localhost:3333/api/users/?name=Priscila&email=priscila@gmail.com
+
+### Buscar usuário por email
+GET http://localhost:3333/api/users/?email=priscila@gmail.com
