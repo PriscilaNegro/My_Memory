@@ -1,6 +1,9 @@
 import UserModel from "../models/user-model.js";
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+const { sign } = jwt;
+
 
 //@desc     Register a user
 //@route    POST /users/create
@@ -14,7 +17,7 @@ export const createUser =asyncHandler(async (req, res) => {
 
     const emailLower = email.toLowerCase();
 
-    if (await UserModel.findByEmail(email)){
+    if (await UserModel.findByEmail(emailLower)){
         res.status(400);
         throw new Error("Email já cadastrado!");
     }
@@ -23,16 +26,58 @@ export const createUser =asyncHandler(async (req, res) => {
     const hashedpassword = await bcrypt.hash(password, 10); // esse 10 são rodadas de 'sal'
     const user = await UserModel.create({
         name,
-        email,
+        email: emailLower,
         passwordHash:hashedpassword});
 
-    if(user){
-        res.status(201).json(user)
-    }
-    else{
-        res.status(400);
-        throw new Error("Dados de usuario invalidos");
-    }
+        res.status(201).json(user);
+});    
+
+//@desc     Login user and generate JWT token
+//@route    POST /users/login
+//@access   Public
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("Email e senha são obrigatórios");
+  }
+
+  const user = await UserModel.findByEmail(email.toLowerCase());
+
+  if (!user) {
+    res.status(401);
+    throw new Error("Email ou senha inválidos");
+  }
+
+  const passwordMatch = await bcrypt.compare(password, user.password);
+
+  if (!passwordMatch) {
+    res.status(401);
+    throw new Error("Email ou senha inválidos");
+  }
+
+  // Gerar token JWT
+  const token = sign(
+    { 
+        user:{
+            id: user.id, 
+            email: user.email,
+            name: user.name 
+        }
+    },
+    process.env.JWT_SECRET, // use variável de ambiente no futuro!
+    { expiresIn: "1h" }
+  );
+  
+  res.status(200).json({
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    },
+    token,
+  });
 });
 
 //@desc     Update a user
@@ -144,5 +189,11 @@ export const getUsers = asyncHandler(async (req, res) => {
     res.status(200).json(allUsers);
 });
 
+// @desc     Get current user data from JWT
+// @route    GET /users/current
+// @access   Private
+export const getCurrentUser = asyncHandler(async (req, res) => {
+  res.json(req.user);
+});
 
 
