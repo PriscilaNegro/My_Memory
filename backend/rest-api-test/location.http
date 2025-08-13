@@ -1,0 +1,7 @@
+POST http://localhost:3333/api/locations
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxNywiZW1haWwiOiJwcmlzY2lsYW5lZ3JvQGdtYWlsLmNvbSIsIm5hbWUiOiJQcmlzY2lsaW5kYTEifSwiaWF0IjoxNzU1MTEzNzc5LCJleHAiOjE3NTUxMTczNzl9.XZ_IudjMaj7rs2f1aLQmPnOKhDrfvCDSobdRKJGemOU
+
+{
+    "name": "sofa"
+}
