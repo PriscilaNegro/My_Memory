@@ -8,18 +8,19 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:3333/api/users/4
+PUT http://localhost:3333/api/users/17
 Content-Type: application/json
 
 {
-    "name": "Priscila"
+    "name": "Priscilinda1",
+    "email":"priscilanegro@gmail.com"
 }
 
 ###
-DELETE http://localhost:3333/api/users/15
+DELETE http://localhost:3333/api/users/16
 
 ###
-GET http://localhost:3333/api/users/4
+GET http://localhost:3333/api/users/17
 
 ### Buscar usuário por nome
 GET http://localhost:3333/api/users/?name=Priscila&email=priscila@gmail.com
@@ -32,6 +33,11 @@ POST http://localhost:3333/api/users/login
 Content-Type: application/json
 
 {
-     "email":"priscilaluzn@gmail.com",
+     "email":"priscilanegro@gmail.com",
      "password": "1234567"
 }
+
+###
+GET http://localhost:3333/api/users/current
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxNywiZW1haWwiOiJwcmlzY2lsYW5lZ3JvQGdtYWlsLmNvbSIsIm5hbWUiOiJQcmlzY2lsaW5kYTEifSwiaWF0IjoxNzU1MDk4NzM5LCJleHAiOjE3NTUxMDIzMzl9.lhGJ0G3leftql8JyyHlkOYemaQxuD86hbUk5A_xMusE

@@ -1,7 +1,7 @@
 import db from "../config/db-postgres.js";
-export const getAllObjects = async() => {
+export const getAllItems = async() => {
     const result = await db.query (
-        "Select * from objects");
+        "Select * from items");
     
     return result.rows;
 }

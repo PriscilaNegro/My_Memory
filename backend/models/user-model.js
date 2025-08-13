@@ -1,7 +1,7 @@
 import pool from '../config/db-postgres.js'
 
 //user model functions
-const UserModel ={
+const UserModel = {
     //cria novo usuário
     async create({name, email, passwordHash}){
         const emailLower = email.toLowerCase();
