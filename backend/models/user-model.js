@@ -8,7 +8,7 @@ const UserModel ={
         const result = await pool.query(
             `insert into users (name, email, password)
              values ($1, $2, $3) returning *`, 
-             [name, email, passwordHash]
+             [name, email.toLowerCase(), passwordHash]
         );
         console.log(result.rows);
         return result.rows[0];
@@ -35,7 +35,7 @@ const UserModel ={
         const emailLower = email.toLowerCase(); 
         const result = await pool.query(
             `select * from users where email = $1`,
-            [emailLower]
+            [email.toLowerCase()]
         );
         return result.rows[0];
     },
@@ -68,7 +68,7 @@ const UserModel ={
     }
     if (email) {
         fields.push(`email = $${index++}`);
-        values.push(email); // já vem em lowercase do controller
+        values.push(email.toLowerCase()); // já vem em lowercase do controller
     }
     if (passwordHash) {
         fields.push(`password = $${index++}`);
