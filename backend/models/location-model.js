@@ -1,11 +1,10 @@
-import db from "../config/db-postgres.js";
+import pool from "../config/db-postgres.js";
 
 const LocationModel = {
-
     async create({ name, userId }) {
         const result = await pool.query(
             `insert into locations (name, user_id)
-            values ($1, $2) returning *`
+            values ($1, $2) returning *`,
             [name, userId]
         );
         return result.rows[0];
@@ -19,7 +18,7 @@ const LocationModel = {
         return result.rows[0];
     },
 
-    async findByUserId(userId){
+    async findByUserId(userId) {
         const result = await pool.query(
             `select * from locations where user_id = $1`,
             [userId]
@@ -27,16 +26,15 @@ const LocationModel = {
     },
 
     async findAll() {
-        const result = await pool.query(
-            `select * from locations`
-        );
+        const result = await pool.query(`select * from locations`);
         return result.rows;
     },
 
-    async update({id,name}) {
+    async update({ id, name }) {
         const result = await pool.query(
-            `update locations set name = $1, update_at = now()
-            where id = $2 returning *`,
+            `update locations set name = $1, updated_at = now()
+             where id = $2 returning *`,
+            [name, id]
         );
         return result.rows[0];
     },
@@ -47,7 +45,7 @@ const LocationModel = {
             [id]
         );
 
-        if (result.rows.length ===0) {
+        if (result.rows.length === 0) {
             throw new Error(`Local com ID ${id} não encontrado`);
         }
 

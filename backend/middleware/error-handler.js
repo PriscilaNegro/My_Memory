@@ -10,20 +10,13 @@ export const notFound = (req, res, next) => {
 // General error handler
 export const errorHandler = (err, req, res, next) => {
     console.log("Middleware de erro ativado:", err.message);
-    const statusCode = res.statusCode
-        ? res.statusCode
-        : http_status_codes.SERVER_ERROR;
 
-    const title = error_titles[statusCode];
+    const statusCode =
+        res.statusCode && res.statusCode !== 200 ? res.statusCode : 400;
 
-    if (title) {
-        res.status(statusCode).json({
-            title,
-            message: err.message,
-            stackTrace: err.stack,
-        });
-    } else {
-        console.log("All good");
-        next(); // em caso de outro handler, manda outro next
-    }
+    res.status(statusCode).json({
+        title: err.title || error_titles[statusCode] || "Erro",
+        message: err.message,
+        stackTrace: process.env.NODE_ENV === "production" ? null : err.stack,
+    });
 };
