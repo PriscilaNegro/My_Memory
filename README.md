@@ -1,6 +1,6 @@
 # 🧠 My Memory
 
-O **My Memory** é um aplicativo voltado para a organização de tens pessoais. Com ele, o usuário pode cadastrar itens com nome, local de armazenamento, data e uma imagem, facilitando a localização e gestão dos itens guardados.
+O **My Memory** é um aplicativo voltado para a organização de itens pessoais. Com ele, o usuário pode cadastrar itens com nome, local de armazenamento, data e uma imagem, facilitando a localização e gestão dos itens guardados.
 
 ---
 
