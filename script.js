@@ -1,8 +1,8 @@
-let objetos = [];
+let items = [];
 let editandoId = null;
 
-const form = document.getElementById("form-objeto");
-const lista = document.getElementById("lista-objetos");
+const form = document.getElementById("form-item");
+const lista = document.getElementById("lista-items");
 
 form.addEventListener("submit", function (e) {
   e.preventDefault();
@@ -17,66 +17,66 @@ form.addEventListener("submit", function (e) {
   }
 
   if (editandoId !==null) {
-    const objeto = objetos.find(o => o.id === editandoId);
-    objeto.nome = nome;
-    objeto.local = local;
-    objeto.imagem = imagem;
-    objeto.dataAtualizacao = new Date();
+    const item = items.find(i => i.id === editandoId);
+    item.nome = nome;
+    item.local = local;
+    item.imagem = imagem;
+    item.dataAtualizacao = new Date();
     editandoId = null;
   } else {
-    const novoObjeto = {
+    const novoItem = {
       id: Date.now().toString(),
       nome,
       local,
       imagem,
       dataCriacao: new Date(),
     };
-    objetos.push(novoObjeto);
+    items.push(novoItem);
   }
 
   form.reset();
-  renderizarObjetos();
+  renderizarItems();
 });
 
-function renderizarObjetos() {
+function renderizarItems() {
   lista.innerHTML = "";
 
-  if (objetos.length === 0) {
-    lista.innerHTML = "<p>Nenhum objeto cadastrado.</p>";
+  if (items.length === 0) {
+    lista.innerHTML = "<p>Nenhum item cadastrado.</p>";
     return;
   }
 
-  objetos.forEach((objeto) => {
+  items.forEach((item) => {
     const div = document.createElement("div");
-    div.className = "objeto";
+    div.className = "item";
     div.innerHTML = `
-      <strong>${objeto.nome}</strong><br>
-      Guardado em: ${objeto.local}<br>
-      ${objeto.imagem ? `<img src="${objeto.imagem}" alt="Imagem">` : ""}
-      <small>Data: ${new Date(objeto.dataCriacao).toLocaleString()}</small><br>
-      <button onclick="editarObjeto('${objeto.id}')">Editar</button>
-      <button onclick="excluirObjeto('${objeto.id}')">Excluir</button>
+      <strong>${item.nome}</strong><br>
+      Guardado em: ${item.local}<br>
+      ${item.imagem ? `<img src="${item.imagem}" alt="Imagem">` : ""}
+      <small>Data: ${new Date(item.dataCriacao).toLocaleString()}</small><br>
+      <button onclick="editarItem('${item.id}')">Editar</button>
+      <button onclick="excluirItem('${item.id}')">Excluir</button>
     `;
 
     lista.appendChild(div);
   });
 }
 
-function editarObjeto(id) {
-  const objeto = objetos.find(o => o.id === id);
-  document.getElementById("nome").value = objeto.nome;
-  document.getElementById("local").value = objeto.local;
-  document.getElementById("imagem").value = objeto.imagem;
+function editarItem(id) {
+  const item = items.find(i => i.id === id);
+  document.getElementById("nome").value = item.nome;
+  document.getElementById("local").value = item.local;
+  document.getElementById("imagem").value = item.imagem;
   editandoId = id;
 }
 
-function excluirObjeto(id) {
+function excluirItem(id) {
   if (confirm("Tem certeza que deseja excluir?")) {
-    objetos = objetos.filter(o => o.id !== id);
-    renderizarObjetos();
+    items = items.filter(i => i.id !== id);
+    renderizarItems();
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  renderizarObjetos();
+  renderizarItems();
 });

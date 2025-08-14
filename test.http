@@ -1,1 +1,1 @@
-GET http://localhost:3333/api/objects/
+GET http://localhost:3333/api/items/
