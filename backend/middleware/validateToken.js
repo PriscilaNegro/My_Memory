@@ -11,7 +11,7 @@ export const validateToken = asyncHandler(async (req, res, next) => {
             if (err) {
                 console.log(err);
                 res.status(401);
-                throw new Error("User is not authorized");
+                throw new Error("Usuário não está autorizado");
             }
             req.user = decoded.user;
             next(); //important!
@@ -20,6 +20,8 @@ export const validateToken = asyncHandler(async (req, res, next) => {
 
     if (!token) {
         res.status(401);
-        throw new Error("User is not authorized or token missing");
+        throw new Error(
+            "O usuário não está autorizado ou o token está faltando"
+        );
     }
 });
