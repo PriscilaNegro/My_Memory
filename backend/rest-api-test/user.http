@@ -2,25 +2,26 @@ POST http://localhost:3333/api/users
 Content-Type: application/json
 
 {
-    "name": "PRISCILA2",
-    "email":"priscilaluzn@gmail.com",
-    "password": "1234567"
+    "name": "Pri",
+    "email":"pris@gmail.com",
+    "password": "123456"
 }
 
 ###
-PUT http://localhost:3333/api/users/17
+PUT http://localhost:3333/api/users/19
 Content-Type: application/json
 
 {
-    "name": "Priscilinda1",
-    "email":"priscilanegro@gmail.com"
+    //"name": "Pris",
+    "email":"prisclona@gmail.com",
+    "password": "123456"
 }
 
 ###
-DELETE http://localhost:3333/api/users/16
+DELETE http://localhost:3333/api/users/
 
 ###
-GET http://localhost:3333/api/users/17
+GET http://localhost:3333/api/users/9
 
 ### Buscar usuário por nome
 GET http://localhost:3333/api/users/?name=Priscila&email=priscila@gmail.com
@@ -33,11 +34,11 @@ POST http://localhost:3333/api/users/login
 Content-Type: application/json
 
 {
-     "email":"priscilanegro@gmail.com",
-     "password": "1234567"
+      "email":"prisclona@gmail.com",
+      "password": "123456"
 }
 
 ###
 GET http://localhost:3333/api/users/current
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxNywiZW1haWwiOiJwcmlzY2lsYW5lZ3JvQGdtYWlsLmNvbSIsIm5hbWUiOiJQcmlzY2lsaW5kYTEifSwiaWF0IjoxNzU1MDk4NzM5LCJleHAiOjE3NTUxMDIzMzl9.lhGJ0G3leftql8JyyHlkOYemaQxuD86hbUk5A_xMusE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxOSwiZW1haWwiOiJwcmlzY0BnbWFpbC5jb20iLCJuYW1lIjoiUHJpcyJ9LCJpYXQiOjE3NTUxOTEwMjQsImV4cCI6MTc1NTE5NDYyNH0.qg08h4isMCfZSF8tMqM__eEV-wu9na5U5dGu5ZqUMyQ

@@ -1,7 +1,26 @@
 POST http://localhost:3333/api/locations
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxNywiZW1haWwiOiJwcmlzY2lsYW5lZ3JvQGdtYWlsLmNvbSIsIm5hbWUiOiJQcmlzY2lsaW5kYTEifSwiaWF0IjoxNzU1MTEzNzc5LCJleHAiOjE3NTUxMTczNzl9.XZ_IudjMaj7rs2f1aLQmPnOKhDrfvCDSobdRKJGemOU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxOSwiZW1haWwiOiJwcmlzY0BnbWFpbC5jb20iLCJuYW1lIjoiUHJpcyJ9LCJpYXQiOjE3NTUxOTE1NTgsImV4cCI6MTc1NTE5NTE1OH0.Gp2nUv3CgZI114AfoklrIkcUAVLDxPIrzaMBAv7HCTA
 
 {
-    "name": "sofa"
+    "name": "armário"
 }
+
+###
+GET http://localhost:3333/api/locations
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxOSwiZW1haWwiOiJwcmlzY0BnbWFpbC5jb20iLCJuYW1lIjoiUHJpcyJ9LCJpYXQiOjE3NTUxOTE1NTgsImV4cCI6MTc1NTE5NTE1OH0.Gp2nUv3CgZI114AfoklrIkcUAVLDxPIrzaMBAv7HCTA
+
+###
+PUT http://localhost:3333/api/locations/6
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxOSwiZW1haWwiOiJwcmlzY0BnbWFpbC5jb20iLCJuYW1lIjoiUHJpcyJ9LCJpYXQiOjE3NTUxOTE1NTgsImV4cCI6MTc1NTE5NTE1OH0.Gp2nUv3CgZI114AfoklrIkcUAVLDxPIrzaMBAv7HCTA
+
+{
+    "name": "sofa 1"
+}
+
+###
+DELETE http://localhost:3333/api/locations/6
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxOSwiZW1haWwiOiJwcmlzY0BnbWFpbC5jb20iLCJuYW1lIjoiUHJpcyJ9LCJpYXQiOjE3NTUxOTE1NTgsImV4cCI6MTc1NTE5NTE1OH0.Gp2nUv3CgZI114AfoklrIkcUAVLDxPIrzaMBAv7HCTA
