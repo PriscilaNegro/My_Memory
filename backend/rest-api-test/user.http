@@ -2,8 +2,8 @@ POST http://localhost:3333/api/users
 Content-Type: application/json
 
 {
-    "name": "Pri",
-    "email":"pris@gmail.com",
+    "name": "Jess",
+    "email":"jess@gmail.com",
     "password": "123456"
 }
 
@@ -34,11 +34,11 @@ POST http://localhost:3333/api/users/login
 Content-Type: application/json
 
 {
-      "email":"prisclona@gmail.com",
+      "email":"jess@gmail.com",
       "password": "123456"
 }
 
 ###
 GET http://localhost:3333/api/users/current
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxOSwiZW1haWwiOiJwcmlzY0BnbWFpbC5jb20iLCJuYW1lIjoiUHJpcyJ9LCJpYXQiOjE3NTUxOTEwMjQsImV4cCI6MTc1NTE5NDYyNH0.qg08h4isMCfZSF8tMqM__eEV-wu9na5U5dGu5ZqUMyQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyMCwiZW1haWwiOiJqZXNzQGdtYWlsLmNvbSIsIm5hbWUiOiJKZXNzIn0sImlhdCI6MTc1NTIwMTIyMiwiZXhwIjoxNzU1MjA0ODIyfQ.cmBfR2L9uig5HgwlXmKQvZKpV6bjOJPqFClSdWPqBMs

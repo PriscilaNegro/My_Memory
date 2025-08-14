@@ -1,18 +1,19 @@
-POST http://localhost:3333/api/locations
+POST http://localhost:3333/api/items
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyMCwiZW1haWwiOiJqZXNzQGdtYWlsLmNvbSIsIm5hbWUiOiJKZXNzIn0sImlhdCI6MTc1NTIwMTIyMiwiZXhwIjoxNzU1MjA0ODIyfQ.cmBfR2L9uig5HgwlXmKQvZKpV6bjOJPqFClSdWPqBMs
 
 {
-    "name": "quarto"
+    "name": "armário",
+    "location": "quarto"   
 }
 
 ###
-GET http://localhost:3333/api/locations
+GET http://localhost:3333/api/items
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxOSwiZW1haWwiOiJwcmlzY0BnbWFpbC5jb20iLCJuYW1lIjoiUHJpcyJ9LCJpYXQiOjE3NTUxOTE1NTgsImV4cCI6MTc1NTE5NTE1OH0.Gp2nUv3CgZI114AfoklrIkcUAVLDxPIrzaMBAv7HCTA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyMCwiZW1haWwiOiJqZXNzQGdtYWlsLmNvbSIsIm5hbWUiOiJKZXNzIn0sImlhdCI6MTc1NTIwMTIyMiwiZXhwIjoxNzU1MjA0ODIyfQ.cmBfR2L9uig5HgwlXmKQvZKpV6bjOJPqFClSdWPqBMs
 
 ###
-PUT http://localhost:3333/api/locations/6
+PUT http://localhost:3333/api/items/6
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxOSwiZW1haWwiOiJwcmlzY0BnbWFpbC5jb20iLCJuYW1lIjoiUHJpcyJ9LCJpYXQiOjE3NTUxOTE1NTgsImV4cCI6MTc1NTE5NTE1OH0.Gp2nUv3CgZI114AfoklrIkcUAVLDxPIrzaMBAv7HCTA
 
@@ -21,6 +22,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxO
 }
 
 ###
-DELETE http://localhost:3333/api/locations/6
+DELETE http://localhost:3333/api/items/6
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxOSwiZW1haWwiOiJwcmlzY0BnbWFpbC5jb20iLCJuYW1lIjoiUHJpcyJ9LCJpYXQiOjE3NTUxOTE1NTgsImV4cCI6MTc1NTE5NTE1OH0.Gp2nUv3CgZI114AfoklrIkcUAVLDxPIrzaMBAv7HCTA
