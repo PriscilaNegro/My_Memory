@@ -9,7 +9,7 @@ router.use(validateToken);
 router
     .route("/")
     .post(locationController.createLocation)
-    .get(locationController.getAllLocations); // listar todas, se quiser limitar só para admins, depois adiciona middleware
+    .get(locationController.getMyLocations);
 
 // Listar todas as localizações do usuário logado
 router.get("/me", locationController.getMyLocations);

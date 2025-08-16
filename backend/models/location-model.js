@@ -23,6 +23,7 @@ const LocationModel = {
             `select * from locations where user_id = $1`,
             [userId]
         );
+        return result.rows;
     },
 
     async findAll() {

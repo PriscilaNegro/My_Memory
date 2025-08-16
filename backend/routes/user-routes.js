@@ -6,16 +6,17 @@ const router = Router();
 
 router.route("/").post(userController.createUser).get(userController.getUsers);
 
+// Nova rota POST /api/users/login para login
+router.post("/login", userController.loginUser);
+
 // Nova rota GET /api/users/current protegida pelo middleware
 router.get("/current", validateToken, userController.getCurrentUser);
 
 router
     .route("/:id")
+    .all(validateToken) // aplica o validateToken em DELETE, PUT e GET
     .delete(userController.deleteUser)
     .put(userController.updateUser)
     .get(userController.getUserById);
-
-// Nova rota POST /api/users/login para login
-router.post("/login", userController.loginUser);
 
 export default router;
