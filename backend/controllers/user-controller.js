@@ -85,13 +85,30 @@ export const loginUser = asyncHandler(async (req, res) => {
 //@access   Public
 export const updateUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { name, email, password } = req.body;
+    const { name, email, password, newPassword } = req.body;
+
+    //Verifica se usuário logado é o mesmo que está sendo atualizado
+    if (req.user.id !== parseInt(id)) {
+        res.status(403);
+        throw new Error("Você não tem permissão para atualizar este usuário");
+    }
 
     //verifica se o usuario existe antes de tentar atualizar
     const existingUser = await UserModel.findById(id);
     if (!existingUser) {
         res.status(404);
         throw new Error(`Usuário com ID ${id} não encontrado`);
+    }
+
+    if (!password) {
+        res.status(400);
+        throw new Error("A senha é obrigatória para atualizar os dados");
+    }
+
+    const passwordMatch = await bcrypt.compare(password, existingUser.password);
+    if (!passwordMatch) {
+        res.status(401);
+        throw new Error("Senha incorreta. Alterações não realizadas.");
     }
 
     if (email) {
@@ -109,8 +126,10 @@ export const updateUser = asyncHandler(async (req, res) => {
 
     if (name !== undefined) updateData.name = name;
     if (email !== undefined) updateData.email = email.toLowerCase();
-    if (password !== undefined) {
-        updateData.passwordHash = await bcrypt.hash(password, 10);
+    //if (password !== undefined) {
+    //  updateData.passwordHash = await bcrypt.hash(password, 10);
+    if (newPassword) {
+        updateData.passwordHash = await bcrypt.hash(newPassword, 10);
     }
 
     //chama o model para atualizar

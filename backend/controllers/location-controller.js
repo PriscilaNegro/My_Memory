@@ -38,7 +38,7 @@ export const getLocationById = asyncHandler(async (req, res) => {
 export const getMyLocations = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const locations = await LocationModel.findByUserId(userId);
-    res.json(locations);
+    res.status(200).json(locations);
 });
 
 //@desc     Get all locations
