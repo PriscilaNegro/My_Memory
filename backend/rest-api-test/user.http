@@ -2,24 +2,25 @@ POST http://localhost:3333/api/users
 Content-Type: application/json
 
 {
-    "name": "Teste20",
-    "email":"teste20@gmail.com",
-    "password": "12345"
+    "name": "Teste21",
+    "email":"teste21@gmail.com",
+    "password": "123456"
 }
 
 ###
-PUT http://localhost:3333/api/users/23
+PUT http://localhost:3333/api/users/29
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyMywiZW1haWwiOiJ0ZXN0ZTEwQGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0ZTEwIn0sImlhdCI6MTc1NTI3MTAyOSwiZXhwIjoxNzU1Mjc0NjI5fQ.LU7QHrldT6wn5R5_cpUJRdpmT9qEk9TPiBSHw8m2Olo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyOSwiZW1haWwiOiJ0ZXN0ZTIxQGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0ZTIxIn0sImlhdCI6MTc1NTUzNDI3OCwiZXhwIjoxNzU1NTM3ODc4fQ.wHjlwvJ5_oQYPndmU11jY5Opa10AKJTnz_t2ru3Wm18
 
 {
-    "name": "Teste101",
-    "email":"teste10@gmail.com",
-    "password": "1234567"
+    "name": "Teste2"
+    //"email":"teste1111@gmail.com",
+    //"password": "1234567"
 }
 
 ###
-DELETE http://localhost:3333/api/users/
+DELETE http://localhost:3333/api/users/28
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyOSwiZW1haWwiOiJ0ZXN0ZTIxQGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0ZTIxIn0sImlhdCI6MTc1NTUzNDI3OCwiZXhwIjoxNzU1NTM3ODc4fQ.wHjlwvJ5_oQYPndmU11jY5Opa10AKJTnz_t2ru3Wm18
 
 ###
 GET http://localhost:3333/api/users
@@ -35,11 +36,11 @@ POST http://localhost:3333/api/users/login
 Content-Type: application/json
 
 {
-    "email":"teste20@gmail.com",
-    "password": "12345"
+    "email":"teste21@gmail.com",
+    "password": "123456"
 }
 
 ###
 GET http://localhost:3333/api/users/current
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyMywiZW1haWwiOiJ0ZXN0ZTEwQGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0ZTEwIn0sImlhdCI6MTc1NTI3MTAyOSwiZXhwIjoxNzU1Mjc0NjI5fQ.LU7QHrldT6wn5R5_cpUJRdpmT9qEk9TPiBSHw8m2Olo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyOSwiZW1haWwiOiJ0ZXN0ZTIxQGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0ZTIxIn0sImlhdCI6MTc1NTUzNDI3OCwiZXhwIjoxNzU1NTM3ODc4fQ.wHjlwvJ5_oQYPndmU11jY5Opa10AKJTnz_t2ru3Wm18

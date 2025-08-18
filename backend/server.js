@@ -10,6 +10,18 @@ const PORT = process.env.PORT || 3333;
 
 app.use(express.json());
 
+// middleware para capturar JSON inválido
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+        console.error("Middleware de erro ativado:", err.message);
+        return res.status(400).json({
+            title: "Invalid JSON",
+            message: "O corpo da requisição contém JSON inválido!",
+        });
+    }
+    next(err);
+});
+
 //rotas
 app.use("/api/items", itemsRoutes);
 app.use("/api/users", userRoutes);

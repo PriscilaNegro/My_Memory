@@ -9,16 +9,27 @@ const { sign } = jwt;
 //@acess    Public
 export const createUser = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
+
     if (!name || !email || !password) {
-        res.status(400);
-        throw new Error("Todos os campos são obrigatórios!");
+        const message = "Todos os campos são obrigatórios!";
+        console.error("Middleware de erro ativado:", message);
+        return res.status(400).json({
+            title: "Validation failed",
+            message,
+        });
     }
 
     const emailLower = email.toLowerCase();
 
     if (await UserModel.findByEmail(emailLower)) {
-        res.status(400);
-        throw new Error("Email já cadastrado!");
+        const message = "Email já cadastrado!";
+        console.error("Middleware de erro ativado:", message);
+        return res.status(400).json({
+            title: "Validation failed",
+            message,
+        });
+        //res.status(400);
+        //throw new Error("Email já cadastrado!");
     }
 
     //hashpassword
@@ -85,7 +96,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 //@access   Public
 export const updateUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { name, email, password, newPassword } = req.body;
+    const { name, email, newPassword } = req.body;
 
     //Verifica se usuário logado é o mesmo que está sendo atualizado
     if (req.user.id !== parseInt(id)) {
@@ -98,17 +109,6 @@ export const updateUser = asyncHandler(async (req, res) => {
     if (!existingUser) {
         res.status(404);
         throw new Error(`Usuário com ID ${id} não encontrado`);
-    }
-
-    if (!password) {
-        res.status(400);
-        throw new Error("A senha é obrigatória para atualizar os dados");
-    }
-
-    const passwordMatch = await bcrypt.compare(password, existingUser.password);
-    if (!passwordMatch) {
-        res.status(401);
-        throw new Error("Senha incorreta. Alterações não realizadas.");
     }
 
     if (email) {
@@ -126,8 +126,6 @@ export const updateUser = asyncHandler(async (req, res) => {
 
     if (name !== undefined) updateData.name = name;
     if (email !== undefined) updateData.email = email.toLowerCase();
-    //if (password !== undefined) {
-    //  updateData.passwordHash = await bcrypt.hash(password, 10);
     if (newPassword) {
         updateData.passwordHash = await bcrypt.hash(newPassword, 10);
     }
@@ -142,7 +140,13 @@ export const updateUser = asyncHandler(async (req, res) => {
 //@route    DELETE /users/:id
 //@acess    Public
 export const deleteUser = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
     const { id } = req.params;
+
+    if (userId !== Number(id)) {
+        res.status(403);
+        throw new Error("Não autorizado a deletar outro usuário");
+    }
 
     const user = await UserModel.findById(id);
 
@@ -216,5 +220,18 @@ export const getUsers = asyncHandler(async (req, res) => {
 // @route    GET /users/current
 // @access   Private
 export const getCurrentUser = asyncHandler(async (req, res) => {
-    res.json(req.user);
+    const userId = req.user.id; // id vindo do JWT
+
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+        res.status(404);
+        throw new Error("Usuário não encontrado");
+    }
+
+    res.json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+    });
 });
