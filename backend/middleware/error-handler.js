@@ -3,7 +3,7 @@ import { http_status_codes, error_titles } from "../constants.js";
 // 404 handler
 export const notFound = (req, res, next) => {
     res.status(http_status_codes.NOT_FOUND);
-    const error = new Error(`Not Found - ${req.originalUrl}`);
+    const error = new Error(`Rota não encontrada - ${req.originalUrl}`);
     next(error);
 };
 
