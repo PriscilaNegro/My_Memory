@@ -55,8 +55,9 @@ export const getAllLocations = asyncHandler(async (req, res) => {
 export const updateLocation = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
+    const userId = req.user.id;
 
-    const updated = await LocationModel.update({ id, name });
+    const updated = await LocationModel.update({ id, name, userId });
 
     if (!updated) {
         res.status(404);
