@@ -71,13 +71,9 @@ export const updateLocation = asyncHandler(async (req, res) => {
 //@acess    Public
 export const deleteLocation = asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const userId = req.user.id;
 
-    const deleted = await LocationModel.delete(id);
-
-    if (!deleted) {
-        res.status(404);
-        throw new Error("Localização não encontrada");
-    }
+    await LocationModel.delete(id, userId);
 
     res.json({ message: "Localização removida com sucesso" });
 });

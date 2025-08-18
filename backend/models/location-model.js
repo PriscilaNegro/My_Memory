@@ -40,14 +40,14 @@ const LocationModel = {
         return result.rows[0];
     },
 
-    async delete(id) {
+    async delete(id, userId) {
         const result = await pool.query(
-            `delete from locations where id = $1 returning *`,
-            [id]
+            `delete from locations where id = $1 and user_id = $2 returning *`,
+            [id, userId]
         );
 
         if (result.rows.length === 0) {
-            throw new Error(`Local com ID ${id} não encontrado`);
+            throw new Error(`Local com ID ${id} não encontrado ou você não tem permissão para deletar`);
         }
 
         return result.rows[0];
