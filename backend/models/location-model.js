@@ -31,12 +31,18 @@ const LocationModel = {
         return result.rows;
     },
 
-    async update({ id, name }) {
+    async update({ id, name, userId }) {
         const result = await pool.query(
             `update locations set name = $1, updated_at = now()
-             where id = $2 returning *`,
-            [name, id]
+             where id = $2 and user_id = $3 returning *`,
+            [name, id, userId]
         );
+
+        if (result.rows.length === 0) {
+            throw new Error(
+                "Localização não encontrada ou você não tem permissão para atualizar"
+            );
+        }
         return result.rows[0];
     },
 
@@ -47,7 +53,9 @@ const LocationModel = {
         );
 
         if (result.rows.length === 0) {
-            throw new Error(`Local com ID ${id} não encontrado ou você não tem permissão para deletar`);
+            throw new Error(
+                `Local com ID ${id} não encontrado ou você não tem permissão para deletar`
+            );
         }
 
         return result.rows[0];

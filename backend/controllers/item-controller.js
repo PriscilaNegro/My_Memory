@@ -78,6 +78,21 @@ export const updateItem = asyncHandler(async (req, res) => {
         throw new Error("Você não tem permissão para atualizar este item");
     }
 
+    // Validar localização somente se fornecida
+    let newLocationId = existingItem.location_id;
+    if (location_id !== undefined) {
+        if (location_id === null) {
+            newLocationId = null; // Permite remover a localização
+        } else {
+            const locationExists = await LocationModel.findById(location_id);
+            if (!locationExists) {
+                res.status(400);
+                throw new Error(`Localização com ID ${location_id} não existe`);
+            }
+            newLocationId = location_id;
+        }
+    }
+
     const updateData = {
         id,
         name: name ?? existingItem.name,
