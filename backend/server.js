@@ -4,9 +4,16 @@ import itemsRoutes from "./routes/item-routes.js";
 import { errorHandler, notFound } from "./middleware/error-handler.js";
 import userRoutes from "./routes/user-routes.js";
 import locationRoutes from "./routes/location-routes.js";
+import cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 3333;
+
+app.use(
+    cors({
+        origin: "http://localhost:3001",
+    })
+);
 
 app.use(express.json());
 
