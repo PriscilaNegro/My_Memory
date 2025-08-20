@@ -17,11 +17,13 @@ O **My Memory** é um aplicativo voltado para a organização de itens pessoais.
 
 ## 🛠️ Tecnologias Utilizadas
 
+- **HTML / CSS / Bootstrap**
 - **JavaScript**
+- **Vue.js**
+- **Vite**
 - **Node.js**
 - **Express**
 - **JWT (Autenticação)**
 - **PostgreSQL**
-- **HTML / CSS / Bootstrap**
 
 
