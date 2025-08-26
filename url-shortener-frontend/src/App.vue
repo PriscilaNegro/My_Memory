@@ -1,6 +1,5 @@
 <template>
-  <div id="app">
-    
+  <div id="app":class="{ fullpage: $route.name === 'NotFound' }">    
      <router-view />
   </div>
 </template>
