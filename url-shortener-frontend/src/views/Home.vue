@@ -21,17 +21,27 @@
 <style scoped>
 .home {
   text-align: center;
-  margin-top: 50px;
+  position: relative;
+  top: -30px;
+}
+
+.home p {
+  font-size: 18px; 
+  margin-bottom: 20px; 
+  color: #000000; 
 }
 
 .buttons {
   margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
 }
 
 button {
-  margin: 10px;
-  padding: 10px 20px;
-  font-size: 16px;
+  width: 160px; 
+  padding: 12px 0; 
+  font-size: 1.25rem;
   border: none;
   border-radius: 8px;
   cursor: pointer;
