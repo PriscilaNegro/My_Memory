@@ -4,9 +4,9 @@
     <p>Preencha os dados abaixo para criar sua conta:</p>
 
     <form @submit.prevent="handleRegister" class="mt-4">
-      <!-- Nome -->
-      <div class="mb-3">
-        <label for="name" class="form-label">Nome</label>
+      
+      <div class="mb-3 text-start">
+        <label for="name" class="form-label">Nome:</label>
         <input
           type="text"
           id="name"
@@ -17,9 +17,8 @@
         />
       </div>
 
-      <!-- Email -->
-      <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
+      <div class="mb-3 text-start">
+        <label for="email" class="form-label">Email:</label>
         <input
           type="email"
           id="email"
@@ -30,9 +29,8 @@
         />
       </div>
 
-      <!-- Senha -->
-      <div class="mb-3">
-        <label for="password" class="form-label">Senha</label>
+      <div class="mb-3 text-start">
+        <label for="password" class="form-label">Senha:</label>
         <input
           type="password"
           id="password"
@@ -43,9 +41,8 @@
         />
       </div>
 
-      <!-- Confirmação de Senha -->
-      <div class="mb-3">
-        <label for="confirmPassword" class="form-label">Confirmar Senha</label>
+      <div class="mb-3 text-start">
+        <label for="confirmPassword" class="form-label">Confirmar Senha:</label>
         <input
           type="password"
           id="confirmPassword"
@@ -61,8 +58,9 @@
         {{ error }}
       </div>
 
-      <!-- Botão de cadastro -->
-      <button type="submit" class="btn btn-primary">Cadastrar</button>
+      <div class="text-center mt-3">
+        <button type="submit" class="btn-home">Cadastrar</button>
+      </div>
     </form>
   </div>
 </template>
@@ -79,24 +77,24 @@ const error = ref("");
 function handleRegister() {
   error.value = "";
 
-  // Validação de email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email.value)) {
     error.value = "Email inválido.";
     return;
   }
 
-  // Verificação de senha
   if (password.value !== confirmPassword.value) {
     error.value = "As senhas não conferem.";
     return;
   }
 
-  // Cadastro válido
   console.log("Cadastro válido:", name.value, email.value);
 
   alert("Cadastro realizado com sucesso!");
-  // Aqui você chamaria sua API para salvar o usuário
+  // Aqui chama API para salvar o usuário
+
+  // Redireciona para login
+  router.push("/login");
 }
 </script>
 
@@ -116,5 +114,21 @@ p {
 .container {
   max-width: 700px;
   margin: auto;
+}
+
+.btn-home {
+  width: 160px; 
+  padding: 12px 0; 
+  font-size: 1.25rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #de7288a8;
+  color: white;
+  transition: background 0.3s ease;
+}
+
+.btn-home:hover {
+  background-color: #e05a75d6;
 }
 </style>
