@@ -6,7 +6,7 @@
     <form @submit.prevent="handleRegister" class="mt-4">
       
       <div class="mb-3 text-start">
-        <label for="name" class="form-label">Nome:</label>
+        <label for="name" class="form-label"> Nome:</label>
         <input
           type="text"
           id="name"
@@ -15,10 +15,11 @@
           placeholder="Digite seu nome"
           required
         />
+        <p v-if="errors.name" class="text-danger mt-1">{{ errors.name }}</p>
       </div>
 
       <div class="mb-3 text-start">
-        <label for="email" class="form-label">Email:</label>
+        <label for="email" class="form-label"> Email:</label>
         <input
           type="email"
           id="email"
@@ -27,10 +28,11 @@
           placeholder="Digite seu email"
           required
         />
+        <p v-if="errors.email" class="text-danger mt-1">{{ errors.email }}</p>
       </div>
 
       <div class="mb-3 text-start">
-        <label for="password" class="form-label">Senha:</label>
+        <label for="password" class="form-label"> Senha:</label>
         <input
           type="password"
           id="password"
@@ -39,10 +41,13 @@
           placeholder="Digite sua senha"
           required
         />
+        <p v-if="password.length > 0 && password.length < 6" class="text-danger mt-1">
+          A senha deve ter no mínimo 6 caracteres.
+        </p>
       </div>
 
       <div class="mb-3 text-start">
-        <label for="confirmPassword" class="form-label">Confirmar Senha:</label>
+        <label for="confirmPassword" class="form-label"> Confirmar Senha:</label>
         <input
           type="password"
           id="confirmPassword"
@@ -51,11 +56,7 @@
           placeholder="Confirme sua senha"
           required
         />
-      </div>
-
-      <!-- Mensagem de erro -->
-      <div v-if="error" class="alert alert-danger">
-        {{ error }}
+        <p v-if="errors.password" class="text-danger mt-1">{{ errors.password }}</p>
       </div>
 
       <div class="text-center mt-3">
@@ -66,34 +67,64 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, reactive } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const name = ref("");
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
-const error = ref("");
+
+const errors = reactive({
+   name: "",
+   email: "",
+   password: "",
+   confirmPassword: ""
+});
+
+const toastVisible = ref(false);
+const toastMessage = ref("");
+
+const allowedDomains = ["gmail.com", "hotmail.com", "outlook.com", "yahoo.com"];
 
 function handleRegister() {
-  error.value = "";
+  errors.email = "";
+  errors.password = "";
+
+  if (name.value.trim().length < 3) {
+  errors.name = "O nome deve ter no mínimo 3 caracteres.";
+  return;
+  }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email.value)) {
-    error.value = "Email inválido.";
+    errors.email = "Email inválido.";
+    return;
+  }
+
+  const domain = email.value.split("@")[1];
+  if (!allowedDomains.some(d => domain.endsWith(d))) {
+    errors.email = `Somente emails dos provedores ${allowedDomains.join(", ")} são aceitos.`;
+    return;
+  }
+
+  if (password.value.length < 6) {
+    errors.password = "A senha deve ter no mínimo 6 caracteres.";
     return;
   }
 
   if (password.value !== confirmPassword.value) {
-    error.value = "As senhas não conferem.";
+    errors.password = "As senhas não conferem.";
     return;
   }
 
   console.log("Cadastro válido:", name.value, email.value);
-
   alert("Cadastro realizado com sucesso!");
+
   // Aqui chama API para salvar o usuário
 
-  // Redireciona para login
   router.push("/login");
 }
 </script>
