@@ -15,7 +15,9 @@
           placeholder="Digite seu nome"
           required
         />
-        <p v-if="errors.name" class="text-danger mt-1">{{ errors.name }}</p>
+        <p v-if="name.length > 0 && name.length < 3" class="text-danger mt-1">
+          O nome deve ter no mínimo 3 caracteres.
+        </p>
       </div>
 
       <div class="mb-3 text-start">
@@ -64,13 +66,16 @@
       </div>
     </form>
   </div>
+  <Notification :visible="showNotification" message="Cadastro realizado com sucesso! Redirecionando..." />
 </template>
 
 <script setup>
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
+import Notification from '../views/Notification.vue';
 
 const router = useRouter();
+const showNotification = ref(false);
 
 const name = ref("");
 const email = ref("");
@@ -84,14 +89,13 @@ const errors = reactive({
    confirmPassword: ""
 });
 
-const toastVisible = ref(false);
-const toastMessage = ref("");
-
 const allowedDomains = ["gmail.com", "hotmail.com", "outlook.com", "yahoo.com"];
 
 function handleRegister() {
+  errors.name = "";
   errors.email = "";
   errors.password = "";
+  errors.confirmPassword = "";
 
   if (name.value.trim().length < 3) {
   errors.name = "O nome deve ter no mínimo 3 caracteres.";
@@ -121,11 +125,14 @@ function handleRegister() {
   }
 
   console.log("Cadastro válido:", name.value, email.value);
-  alert("Cadastro realizado com sucesso!");
-
+  
   // Aqui chama API para salvar o usuário
 
-  router.push("/login");
+  showNotification.value = true; 
+
+  setTimeout(() => {
+    router.push('/login');
+  }, 3000);
 }
 </script>
 
