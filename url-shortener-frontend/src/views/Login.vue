@@ -14,22 +14,37 @@
           class="form-control"
           placeholder="Digite seu email"
           required
+          @blur="validateEmail"
         />
         <p v-if="errors.email" class="text-danger mt-1">{{ errors.email }}</p>
       </div>
 
       <div class="mb-3 text-start">
         <label for="password" class="form-label">Senha:</label>
-        <input
-          type="password"
-          id="password"
-          v-model="password"
-          class="form-control"
-          placeholder="Digite sua senha"
-          required
-        />
+        <div class="input-group">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            id="password"
+            v-model="password"
+            class="form-control"
+            placeholder="Digite sua senha"
+            required
+            @blur="validatePassword"
+          />
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            @click="togglePassword"
+            >
+           <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+          </button>
+
+        </div>
         <p v-if="errors.password" class="text-danger mt-1">{{ errors.password }}</p>
       </div>
+
+
+      <p v-if="errors.api" class="text-danger mt-2">{{ errors.api }}</p>
 
       <div class="text-center mt-3">
         <button type="submit" class="btn-home">Entrar</button>
@@ -53,20 +68,45 @@ const router = useRouter();
 const email = ref("");
 const password = ref("");
 const showNotification = ref(false);
+const showPassword = ref(false);
 
 const errors = reactive({
   email: "",
   password: "",
+  api: ""
 });
 
+function togglePassword() {
+  showPassword.value = !showPassword.value;
+}
+
 // Validações básicas
-function validateForm() {
+function validateEmail() {
   errors.email = "";
-  errors.password = "";
+
+  if (!email.value.trim()) {
+    errors.email = "O email é obrigatório.";
+    return;
+  }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email.value)) {
     errors.email = "Email inválido.";
+    return;
+  }
+
+  const allowedDomains = ["gmail.com", "hotmail.com", "outlook.com", "yahoo.com"];
+  const domain = email.value.split("@")[1];
+  if (!allowedDomains.some(d => domain.endsWith(d))) {
+    errors.email = `Somente emails dos provedores ${allowedDomains.join(", ")} são aceitos.`;
+  }
+}
+
+function validatePassword() {
+  errors.password = "";
+
+  if (!password.value.trim()) {
+    errors.password = "A senha é obrigatória.";
     return false;
   }
 
@@ -76,6 +116,12 @@ function validateForm() {
   }
 
   return true;
+}
+
+function validateForm() {
+  const emailValid = validateEmail();
+  const passwordValid = validatePassword();
+  return emailValid && passwordValid;
 }
 
 async function handleLogin() {
@@ -92,8 +138,14 @@ async function handleLogin() {
       }),
     });
 
+    if (response.status === 401) {
+      errors.api = "Email ou senha incorretos.";
+      return;
+    }
+
     if (!response.ok) {
-      throw new Error("Credenciais inválidas.");
+      errors.api = "Erro ao conectar com o servidor.";
+      return;
     }
 
     const data = await response.json();
@@ -107,7 +159,7 @@ async function handleLogin() {
       router.push("/dashboard"); // página futura
     }, 2000);
   } catch (error) {
-    errors.password = error.message || "Erro ao realizar login.";
+    errors.api = error.message || "Erro ao realizar login.";
   }
 }
 </script>
