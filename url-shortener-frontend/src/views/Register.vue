@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-5">
-    <h1>Página de Cadastro My Memory 🧠</h1>
+    <h1>Cadastro My Memory 🧠</h1>
     <p>Preencha os dados abaixo para criar sua conta:</p>
 
     <form @submit.prevent="handleRegister" class="mt-4">
