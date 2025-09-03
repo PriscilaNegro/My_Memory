@@ -15,6 +15,7 @@
           placeholder="Digite seu email"
           required
           @blur="validateEmail"
+          @input="errors.api = ''"
         />
         <p v-if="errors.email" class="text-danger mt-1">{{ errors.email }}</p>
       </div>
@@ -30,6 +31,7 @@
             placeholder="Digite sua senha"
             required
             @blur="validatePassword"
+            @input="errors.api = ''"
           />
           <button
             type="button"
@@ -43,11 +45,22 @@
         <p v-if="errors.password" class="text-danger mt-1">{{ errors.password }}</p>
       </div>
 
+      <div class="text-center mb-3 forgot-password">
+        <router-link to="/forgot-password" class="text-decoration-none">
+          Esqueci minha senha
+        </router-link>
+      </div>
 
       <p v-if="errors.api" class="text-danger mt-2">{{ errors.api }}</p>
 
       <div class="text-center mt-3">
-        <button type="submit" class="btn-home">Entrar</button>
+        <button 
+          type="submit" 
+          class="btn-home" 
+          :disabled="!isFormValid"
+          >
+          Entrar
+        </button>
       </div>
     </form>
 
@@ -59,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
 import { useRouter } from "vue-router";
 import Notification from "../views/Notification.vue";
 
@@ -86,20 +99,22 @@ function validateEmail() {
 
   if (!email.value.trim()) {
     errors.email = "O email é obrigatório.";
-    return;
+    return false;
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email.value)) {
     errors.email = "Email inválido.";
-    return;
+    return false;
   }
 
   const allowedDomains = ["gmail.com", "hotmail.com", "outlook.com", "yahoo.com"];
   const domain = email.value.split("@")[1];
   if (!allowedDomains.some(d => domain.endsWith(d))) {
     errors.email = `Somente emails dos provedores ${allowedDomains.join(", ")} são aceitos.`;
+    return false;
   }
+  return true;
 }
 
 function validatePassword() {
@@ -117,6 +132,16 @@ function validatePassword() {
 
   return true;
 }
+
+const isFormValid = computed(() => {
+  return (
+    email.value.trim() &&
+    password.value.trim() &&
+    password.value.length >= 6 &&
+    !errors.email &&
+    !errors.password
+  );
+});
 
 function validateForm() {
   const emailValid = validateEmail();
@@ -182,6 +207,16 @@ p {
   margin: auto;
 }
 
+.forgot-password a {
+  color: rgb(83, 83, 83);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.forgot-password a:hover {
+  color: #313131; 
+}
+
 .btn-home {
   width: 160px;
   padding: 12px 0;
@@ -197,4 +232,13 @@ p {
 .btn-home:hover {
   background-color: #e05a75d6;
 }
+
+.btn-home:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+
 </style>
+
+
