@@ -10,7 +10,9 @@ const routes = [
   { path: "/register", name: "Register", component: Register },
   { path: "/login", name: "Login", component: Login },
   { path: '/forgot-password', name: 'ForgotPassword', component: ForgotPassword },
-  { path: "/:pathMatch(.*)*", name: "NotFound", component: NotFound }
+  { path: "/:pathMatch(.*)*", name: "NotFound", component: NotFound },
+  { path: '/dashboard', name: 'Dashboard', component: () => import('../views/Dashboard.vue')},
+    //meta: { requiresAuth: true } // proteger a rota
 ];
 
 const router = createRouter({
