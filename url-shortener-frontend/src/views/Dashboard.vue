@@ -7,7 +7,7 @@
       <table class="table table-hover table-bordered align-middle text-center mt-3">
         <thead class="custom-header">
           <tr>
-            <th>Nome do Item</th>
+            <th>Item</th>
             <th>Local Armazenado</th>
             <th></th> 
           </tr>
@@ -17,7 +17,7 @@
             <td>{{ item.name }}</td>
             <td>{{ item.location }}</td>
             <td>
-              <button class="btn btn-sm btn-warning me-2" @click="editItem(item.id)">Editar</button>
+              <button class="btn btn-sm btn-warning me-2" @click="openEditModal(item)">Editar</button>
               <button class="btn btn-sm btn-outline-danger" @click="deleteItem(item.id)">Excluir</button>
             </td>
           </tr>
@@ -30,12 +30,38 @@
     </div>
 
     <button class="btn btn-primary mt-4" @click="addItem">Adicionar Item</button>
+  
+   <div class="modal fade" id="editModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="updateItem">
+              <div class="mb-3">
+                <label class="form-label">Nome do Item</label>
+                <input v-model="selectedItem.name" type="text" class="form-control" required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Local Armazenado</label>
+                <input v-model="selectedItem.location" type="text" class="form-control" required />
+              </div>
+              <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
 </template>
 
 <script setup>
 import { ref } from "vue"
 import { useRouter } from "vue-router"
+import * as bootstrap from "bootstrap"
 
 const router = useRouter()
 
@@ -45,12 +71,29 @@ const items = ref([
   { id: 2, name: "Chave do carro", location: "Porta da sala" }
 ])
 
-const addItem = () => {
-  router.push("/add-item")
+const selectedItem = ref({ id: null, name: "", location: "" })
+
+let editModal = null
+
+const openEditModal = (item) => {
+  selectedItem.value = { ...item } // clona os dados
+  if (!editModal) {
+    editModal = new bootstrap.Modal(document.getElementById("editModal"))
+  }
+  editModal.show()
 }
 
-const editItem = (id) => {
-  router.push(`/edit-item/${id}`)
+const updateItem = () => {
+  const index = items.value.findIndex(i => i.id === selectedItem.value.id)
+  if (index !== -1) {
+    items.value[index] = { ...selectedItem.value }
+    localStorage.setItem("items", JSON.stringify(items.value))
+  }
+  editModal.hide()
+}
+
+const addItem = () => {
+  router.push("/add-item")
 }
 
 const deleteItem = (id) => {
@@ -62,9 +105,9 @@ const deleteItem = (id) => {
 </script>
 
 <style scoped>
-:deep(.custom-header) {
+:deep(.custom-header th) {
   background-color: #de7288a8;
-  color: #fff;
+  color: #000000;
 }
 
 .btn-warning {
@@ -73,12 +116,20 @@ const deleteItem = (id) => {
   color: #fff;
 }
 
+.btn-warning:hover {
+  background-color: #e05a75d6;
+}
+
 .btn-outline-danger {
-  border-width: 2px;
+  border-width: 1px;
 }
 
 .btn-primary {
   background-color: #de7288a8;
   border: none;
+}
+
+.btn-primary:hover {
+  background-color: #e05a75d6;
 }
 </style>
