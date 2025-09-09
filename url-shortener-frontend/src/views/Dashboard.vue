@@ -1,7 +1,14 @@
 <template>
   <div>
-    <header class="fixed-header d-flex align-items-center px-4">
-      <h1 class="header-title">Olá, {{ user.name }}!</h1>
+    <header class="fixed-header d-flex justify-content-between align-items-center px-4">
+      <h1 class="header-title">My Memory 🧠</h1>
+      <div class="user-info d-flex align-items-center">
+        <span class="user-greeting me-2">Olá, {{ user.name }}</span>
+        <img
+         :src="user.photo || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'"
+         alt="Foto de perfil"
+         class="profile-pic"/>
+      </div>
     </header>
 
     <aside class="sidebar d-flex flex-column p-3">
@@ -11,8 +18,7 @@
 
     <div class="main-wrapper d-flex justify-content-center">
       <div class="container main-content">
-        <h1>My Memory 🧠</h1>
-        <p class="mb-4">Esses são seus itens cadastrados:</p>
+        <p class="main-subtitle mb-4">Esses são seus itens cadastrados:</p>
 
         <div v-if="items.length">
           <table class="table table-hover table-bordered align-middle text-center mt-3">
@@ -57,28 +63,11 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Local Armazenado</label>
-                <div class="input-group">
-                  <select v-model="newItem.location" class="form-select" required>
-                    <option disabled value="">Selecione um local</option>
-                    <option v-for="loc in locations" :key="loc" :value="loc">{{ loc }}</option>
-                  </select>
-                  <button class="btn btn-outline-secondary" type="button" @click="openLocationModal">+</button>
-                </div>
+                <select v-model="newItem.location" class="form-select" required>
+                  <option disabled value="">Selecione um local</option>
+                  <option v-for="loc in locations" :key="loc" :value="loc">{{ loc }}</option>
+                </select>
               </div>
-
-              <ul class="list-group mt-2">
-                <li
-                  v-for="(loc, index) in locations"
-                  :key="loc"
-                  class="list-group-item d-flex justify-content-between align-items-center"
-                >
-                  {{ loc }}
-                  <button class="btn btn-sm btn-outline-danger" @click="deleteLocation(index)">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </li>
-              </ul>
-
               <button type="submit" class="btn btn-primary mt-3">Adicionar</button>
             </form>
           </div>
@@ -90,7 +79,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Adicionar Local</h5>
+            <h5 class="modal-title">Gerenciar Locais</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
@@ -101,6 +90,19 @@
               </div>
               <button type="submit" class="btn btn-primary">Adicionar Local</button>
             </form>
+
+            <ul class="list-group mt-3">
+              <li
+                v-for="(loc, index) in locations"
+                :key="loc"
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                {{ loc }}
+                <button class="btn btn-sm btn-outline-danger" @click="openDeleteLocationModal(loc, index)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -151,6 +153,32 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="deleteLocationModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-danger">Excluir Local</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Tem certeza que deseja excluir o local
+              <strong>{{ locationToDelete?.name }}</strong>?
+            </p>
+            <div v-if="linkedItems.length" class="alert alert-warning mt-3">
+              Atenção ⚠️ Este local está associado a
+              <strong>{{ linkedItems.length }}</strong>
+              item(s). Eles perderão a referência ao local.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button class="btn btn-danger" @click="confirmDeleteLocation">Excluir</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -158,7 +186,7 @@
 import { ref } from "vue";
 import * as bootstrap from "bootstrap";
 
-const user = ref({ name: "Priscila" });
+const user = ref({ name: "Priscila", photo: "" });
 const items = ref([
   { id: 1, name: "Notebook", location: "Mesa do escritório" },
   { id: 2, name: "Chave do carro", location: "Porta da sala" },
@@ -177,6 +205,11 @@ const itemToDelete = ref(null);
 let deleteModal = null;
 
 let locationModal = null;
+
+const locationToDelete = ref(null);
+let deleteLocationModal = null;
+
+const linkedItems = ref([]);
 
 const openAddModal = () => {
   newItem.value = { name: "", location: "" };
@@ -228,15 +261,27 @@ const openLocationModal = () => {
 
 const saveNewLocation = () => {
   locations.value.push(newLocation.value);
-  newItem.value.location = newLocation.value;
-  locationModal.hide();
+  localStorage.setItem("locations", JSON.stringify(locations.value));
+  newLocation.value = "";
 };
 
-const deleteLocation = (index) => {
-  const removed = locations.value.splice(index, 1);
-  items.value.forEach(item => {
-    if(item.location === removed[0]) item.location = '';
-  });
+const openDeleteLocationModal = (loc, index) => {
+  locationToDelete.value = { name: loc, index };
+  linkedItems.value = items.value.filter(item => item.location === loc);
+  if (!deleteLocationModal) deleteLocationModal = new bootstrap.Modal(document.getElementById("deleteLocationModal"));
+  deleteLocationModal.show();
+};
+
+const confirmDeleteLocation = () => {
+  if (locationToDelete.value) {
+    const removed = locations.value.splice(locationToDelete.value.index, 1);
+    items.value.forEach(item => {
+      if (item.location === removed[0]) item.location = "";
+    });
+    localStorage.setItem("locations", JSON.stringify(locations.value));
+    localStorage.setItem("items", JSON.stringify(items.value));
+  }
+  deleteLocationModal.hide();
 };
 </script>
 
@@ -247,11 +292,12 @@ const deleteLocation = (index) => {
   left: 0;
   width: 100%;
   height: 70px;
-  background-color: #de7288a8;
+  background-color: #d8909fa8;
   color: #000;
   z-index: 1000;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 20px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
@@ -259,6 +305,19 @@ const deleteLocation = (index) => {
 .header-title {
   font-size: 2rem;
   font-weight: 500;
+}
+
+.user-greeting {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; 
+  object-fit: cover;  
+  border: 2px solid #fff; 
 }
 
 .sidebar {
@@ -282,18 +341,24 @@ const deleteLocation = (index) => {
 }
 
 .main-wrapper {
-  margin-top: 90px;
+  margin-top: 30px;
   margin-left: 240px; 
   display: flex;
   justify-content: center; 
 }
 
 .main-content {
-  max-width: 800px; 
+  max-width: 900px; 
+}
+
+.main-subtitle {
+  font-size: 1.2rem;   
+  font-weight: 500;    
+  color: #000000;         
 }
 
 :deep(.custom-header th) {
-  background-color: #de7288a8;
+  background-color:  #d85c6a6e;
   color: #000;
 }
 
@@ -329,4 +394,18 @@ const deleteLocation = (index) => {
 .btn-secondary:hover {
   background-color: #e05a75d6;
 }
+
+.table {
+  font-size: 1rem;     
+}
+
+.table th, .table td {
+  padding: 12px 15px; 
+}
+
+.table th {
+  font-size: 1.1rem;    
+  font-weight: 500;
+}
+
 </style>
