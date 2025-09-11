@@ -5,49 +5,90 @@
       <div class="user-info d-flex align-items-center">
         <span class="user-greeting me-2">Olá, {{ user.name }}</span>
         <img
-         :src="user.photo || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'"
-         alt="Foto de perfil"
-         class="profile-pic"/>
+          :src="user.photo || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'"
+          alt="Foto de perfil"
+          class="profile-pic"
+        />
       </div>
     </header>
 
-    <aside class="sidebar d-flex flex-column p-3">
-      <button class="btn btn-primary mb-2" @click="openAddModal">Adicionar Item</button>
-      <button class="btn btn-secondary" @click="openLocationModal">Adicionar Local</button>
-    </aside>
-
     <div class="main-wrapper d-flex justify-content-center">
       <div class="container main-content">
-        <p class="main-subtitle mb-4">Esses são seus itens cadastrados:</p>
+        <p class="main-subtitle mb-4 text-center">Esses são seus itens cadastrados:</p>
 
-        <div v-if="items.length">
-          <table class="table table-hover table-bordered align-middle text-center mt-3">
-            <thead class="custom-header">
-              <tr>
-                <th>Item</th>
-                <th>Local Armazenado</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in items" :key="item.id">
-                <td>{{ item.name }}</td>
-                <td>{{ item.location }}</td>
-                <td>
-                  <button class="btn btn-sm btn-warning me-2" @click="openEditModal(item)">Editar</button>
-                  <button class="btn btn-sm btn-outline-danger" @click="openDeleteModal(item)">Excluir</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- 🔍 Pesquisa no DESKTOP -->
+        <div class="search-bar d-none d-md-flex justify-content-end align-items-center mb-3 gap-2">
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="Pesquisar..." 
+            class="form-control w-auto"
+          />
+          <select v-model="searchCategory" class="form-select w-auto">
+            <option value="all">Todos</option>
+            <option value="name">Itens</option>
+            <option value="location">Locais</option>
+            <option value="datetime">Datas</option>
+          </select>
         </div>
 
-        <div v-else class="mt-3 alert alert-warning">
-          Você ainda não cadastrou nenhum item.
+        <!-- Tabela filtrada -->
+        <div v-if="filteredItems.length">
+          <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle text-center mt-3">
+              <thead class="custom-header">
+                <tr>
+                  <th>Item</th>
+                  <th>Local Armazenado</th>
+                  <th>Data/Hora</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in filteredItems" :key="item.id">
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.location }}</td>
+                  <td>{{ item.datetime }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-warning me-2" @click="openEditModal(item)">Editar</button>
+                    <button class="btn btn-sm btn-outline-danger" @click="openDeleteModal(item)">Excluir</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div v-else class="alert alert-warning mt-3">
+          Nenhum item encontrado para a pesquisa.
+        </div>
+
+        <!-- 🔍 Pesquisa no MOBILE -->
+        <div class="search-bar d-flex d-md-none justify-content-center align-items-center gap-2 mt-3 flex-wrap">
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="Pesquisar..." 
+            class="form-control w-100"
+          />
+          <select v-model="searchCategory" class="form-select w-100">
+            <option value="all">Todos</option>
+            <option value="name">Itens</option>
+            <option value="location">Locais</option>
+            <option value="datetime">Datas</option>
+          </select>
+        </div>
+
+        <!-- Botões de ação -->
+        <div class="action-buttons d-flex justify-content-center gap-3 mt-4 flex-wrap">
+          <button class="btn btn-primary btn-action" @click="openAddModal">Adicionar Novo Item</button>
+          <button class="btn btn-secondary btn-action" @click="openLocationModal">Adicionar Novo Local</button>
         </div>
       </div>
     </div>
 
+    <!-- ========== MODAIS (sem alteração) ========== -->
+
+    <!-- Modal Adicionar Item -->
     <div class="modal fade" id="addModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -75,6 +116,7 @@
       </div>
     </div>
 
+    <!-- Modal Gerenciar Locais -->
     <div class="modal fade" id="locationModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -108,6 +150,7 @@
       </div>
     </div>
 
+    <!-- Modal Editar Item -->
     <div class="modal fade" id="editModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -135,6 +178,7 @@
       </div>
     </div>
 
+    <!-- Modal Excluir Item -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -154,6 +198,7 @@
       </div>
     </div>
 
+    <!-- Modal Excluir Local -->
     <div class="modal fade" id="deleteLocationModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -183,34 +228,57 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import * as bootstrap from "bootstrap";
 
 const user = ref({ name: "Priscila", photo: "" });
 const items = ref([
-  { id: 1, name: "Notebook", location: "Mesa do escritório" },
-  { id: 2, name: "Chave do carro", location: "Porta da sala" },
+  { id: 1, name: "Notebook", location: "Mesa do escritório", datetime: "11/09/2025 12:30" },
+  { id: 2, name: "Chave do carro", location: "Porta da sala", datetime: "11/09/2025 13:45" },
 ]);
 
 const locations = ref(["Mesa do escritório", "Porta da sala"]);
 const newLocation = ref("");
-
 const newItem = ref({ name: "", location: "" });
+
 let addModal = null;
-
-const selectedItem = ref({ id: null, name: "", location: "" });
 let editModal = null;
-
-const itemToDelete = ref(null);
 let deleteModal = null;
-
 let locationModal = null;
-
-const locationToDelete = ref(null);
 let deleteLocationModal = null;
 
+const selectedItem = ref({ id: null, name: "", location: "" });
+const itemToDelete = ref(null);
+const locationToDelete = ref(null);
 const linkedItems = ref([]);
 
+// 🔍 Estado da pesquisa
+const searchQuery = ref("");
+const searchCategory = ref("all");
+
+// 🧮 Computed para filtragem
+const filteredItems = computed(() => {
+  if (!searchQuery.value) return items.value;
+  const query = searchQuery.value.toLowerCase();
+
+  return items.value.filter(item => {
+    if (searchCategory.value === "all") {
+      return (
+        item.name.toLowerCase().includes(query) ||
+        item.location.toLowerCase().includes(query) ||
+        (item.datetime && item.datetime.toLowerCase().includes(query))
+      );
+    } else if (searchCategory.value === "name") {
+      return item.name.toLowerCase().includes(query);
+    } else if (searchCategory.value === "location") {
+      return item.location.toLowerCase().includes(query);
+    } else if (searchCategory.value === "datetime") {
+      return item.datetime && item.datetime.toLowerCase().includes(query);
+    }
+  });
+});
+
+// ========== Métodos dos modais (mesmos que você já tinha) ==========
 const openAddModal = () => {
   newItem.value = { name: "", location: "" };
   if (!addModal) addModal = new bootstrap.Modal(document.getElementById("addModal"));
@@ -219,7 +287,9 @@ const openAddModal = () => {
 
 const saveNewItem = () => {
   const id = items.value.length ? Math.max(...items.value.map(i => i.id)) + 1 : 1;
-  items.value.push({ id, ...newItem.value });
+  const now = new Date();
+  const datetime = now.toLocaleString();
+  items.value.push({ id, ...newItem.value, datetime });
   localStorage.setItem("items", JSON.stringify(items.value));
   addModal.hide();
 };
@@ -233,7 +303,9 @@ const openEditModal = (item) => {
 const updateItem = () => {
   const index = items.value.findIndex(i => i.id === selectedItem.value.id);
   if (index !== -1) {
-    items.value[index] = { ...selectedItem.value };
+    const now = new Date();
+    const datetime = now.toLocaleString();
+    items.value[index] = { ...selectedItem.value, datetime };
     localStorage.setItem("items", JSON.stringify(items.value));
   }
   editModal.hide();
@@ -320,35 +392,17 @@ const confirmDeleteLocation = () => {
   border: 2px solid #fff; 
 }
 
-.sidebar {
-  position: fixed;
-  top: 70px;
-  left: 0;
-  width: 220px;
-  height: calc(100% - 70px);
-  background-color: #f8f9fa;
-  border-right: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-  z-index: 900;
-}
-
-.sidebar .btn {
-  width: 100%;
-  font-weight: 500;
-}
-
 .main-wrapper {
-  margin-top: 30px;
-  margin-left: 240px; 
+  margin-top: 90px; 
   display: flex;
   justify-content: center; 
+  align-items: center;
+  width: 100%;
 }
 
 .main-content {
   max-width: 900px; 
+  width: 100%;
 }
 
 .main-subtitle {
@@ -408,4 +462,55 @@ const confirmDeleteLocation = () => {
   font-weight: 500;
 }
 
+.btn-action {
+  min-width: 150px; 
+  max-width: 220px; 
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+.search-bar input, 
+.search-bar select {
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .main-wrapper {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .header-title {
+    font-size: 1.5rem;
+  }
+
+  .user-greeting {
+    font-size: 1rem;
+  }
+
+  .table th, .table td {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  .action-buttons button {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-title {
+    font-size: 1.3rem;
+  }
+
+  .user-greeting {
+    font-size: 0.9rem;
+  }
+
+  .table th, .table td {
+    font-size: 0.8rem;
+    padding: 6px 8px;
+  }
+}
 </style>
