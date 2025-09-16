@@ -3,19 +3,19 @@
     <h1>Cadastro My Memory 🧠</h1>
     <p>Preencha os dados abaixo para criar sua conta:</p>
 
-    <form @submit.prevent="handleRegister" class="mt-4">
+    <form v-on:submit.prevent="handleRegister" class="mt-4">
       
       <div class="mb-3 text-start">
         <label for="name" class="form-label"> Nome:</label>
         <input
           type="text"
           id="name"
-          v-model="name"
+          v-model="form.name"
           class="form-control"
           placeholder="Digite seu nome"
           required
         />
-        <p v-if="name.length > 0 && name.length < 3" class="text-danger mt-1">
+        <p v-if="form.name.length > 0 && form.name.length < 3" class="text-danger mt-1">
           O nome deve ter no mínimo 3 caracteres.
         </p>
       </div>
@@ -25,7 +25,7 @@
         <input
           type="email"
           id="email"
-          v-model="email"
+          v-model="form.email"
           class="form-control"
           placeholder="Digite seu email"
           required
@@ -38,12 +38,12 @@
         <input
           type="password"
           id="password"
-          v-model="password"
+          v-model="form.password"
           class="form-control"
           placeholder="Digite sua senha"
           required
         />
-        <p v-if="password.length > 0 && password.length < 6" class="text-danger mt-1">
+        <p v-if="form.password.length > 0 && form.password.length < 6" class="text-danger mt-1">
           A senha deve ter no mínimo 6 caracteres.
         </p>
       </div>
@@ -53,7 +53,7 @@
         <input
           type="password"
           id="confirmPassword"
-          v-model="confirmPassword"
+          v-model="form.confirmPassword"
           class="form-control"
           placeholder="Confirme sua senha"
           required
@@ -74,65 +74,81 @@ import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import Notification from '../views/Notification.vue';
 
+//Importar toda vez que for chamar o backend
+import api from "../api";
+
 const router = useRouter();
 const showNotification = ref(false);
 
-const name = ref("");
-const email = ref("");
-const password = ref("");
-const confirmPassword = ref("");
+//Reactive usar para Formulário com vários campos
+//Ref Valor único (contador, toggle, input isolado)
+
+const form = reactive ({
+  name: '',
+  email: '',
+  password: '',
+  confirmPassword: ''
+});
 
 const errors = reactive({
-   name: "",
    email: "",
    password: "",
-   confirmPassword: ""
 });
 
 const allowedDomains = ["gmail.com", "hotmail.com", "outlook.com", "yahoo.com"];
 
-function handleRegister() {
-  errors.name = "";
-  errors.email = "";
-  errors.password = "";
-  errors.confirmPassword = "";
+const handleRegister = async () => {
 
-  if (name.value.trim().length < 3) {
+  if (form.name.trim().length < 3) {
   errors.name = "O nome deve ter no mínimo 3 caracteres.";
   return;
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email.value)) {
+  if (!emailRegex.test(form.email)) {
     errors.email = "Email inválido.";
     return;
   }
 
-  const domain = email.value.split("@")[1];
+  const domain = form.email.split("@")[1];
   if (!allowedDomains.some(d => domain.endsWith(d))) {
     errors.email = `Somente emails dos provedores ${allowedDomains.join(", ")} são aceitos.`;
     return;
   }
 
-  if (password.value.length < 6) {
+  if (form.password.length < 6) {
     errors.password = "A senha deve ter no mínimo 6 caracteres.";
     return;
   }
 
-  if (password.value !== confirmPassword.value) {
+  if (form.password !== form.confirmPassword) {
     errors.password = "As senhas não conferem.";
     return;
   }
-
-  console.log("Cadastro válido:", name.value, email.value);
   
   // Aqui chama API para salvar o usuário
+  try {
+    //endpoint do backend, sempre usar await
+    const response = await api.post("/users", form);
+    if (response) {
+      form.name = "";
+      form.email = "";
+      form.password = "";
+      form.confirmPassword = "";
 
-  showNotification.value = true; 
-
-  setTimeout(() => {
-    router.push('/login');
-  }, 3000);
+      showNotification.value = true; 
+      setTimeout(() => {
+        router.push('/login');
+      }, 1500);
+    }
+  } catch (error) {
+    if (error.response && error.response.data) {
+        // Captura o erro enviado pelo backend em error.response.data
+        errors.email = error.response.data.message;
+      } else {
+        console.error("Erro inesperado:", error);
+      }
+  }
 }
 </script>
 
