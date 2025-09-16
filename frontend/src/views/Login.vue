@@ -10,7 +10,7 @@
         <input
           type="email"
           id="email"
-          v-model="email"
+          v-model="form.email"
           class="form-control"
           placeholder="Digite seu email"
           required
@@ -26,7 +26,7 @@
           <input
             :type="showPassword ? 'text' : 'password'"
             id="password"
-            v-model="password"
+            v-model="form.password"
             class="form-control"
             placeholder="Digite sua senha"
             required
@@ -63,24 +63,21 @@
         </button>
       </div>
     </form>
-
-    <Notification
-      :visible="showNotification"
-      message="Login realizado com sucesso! Redirecionando..."
-    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed } from "vue";
 import { useRouter } from "vue-router";
-import Notification from "../views/Notification.vue";
+import api from "../api";
 
 const router = useRouter();
 
-const email = ref("");
-const password = ref("");
-const showNotification = ref(false);
+const form = reactive ({
+  email: '',
+  password: '',
+});
+
 const showPassword = ref(false);
 
 const errors = reactive({
@@ -97,19 +94,19 @@ function togglePassword() {
 function validateEmail() {
   errors.email = "";
 
-  if (!email.value.trim()) {
+  if (!form.email.trim()) {
     errors.email = "O email é obrigatório.";
     return false;
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email.value)) {
+  if (!emailRegex.test(form.email)) {
     errors.email = "Email inválido.";
     return false;
   }
 
   const allowedDomains = ["gmail.com", "hotmail.com", "outlook.com", "yahoo.com"];
-  const domain = email.value.split("@")[1];
+  const domain = form.email.split("@")[1];
   if (!allowedDomains.some(d => domain.endsWith(d))) {
     errors.email = `Somente emails dos provedores ${allowedDomains.join(", ")} são aceitos.`;
     return false;
@@ -120,12 +117,12 @@ function validateEmail() {
 function validatePassword() {
   errors.password = "";
 
-  if (!password.value.trim()) {
+  if (!form.password.trim()) {
     errors.password = "A senha é obrigatória.";
     return false;
   }
 
-  if (password.value.length < 6) {
+  if (form.password.length < 6) {
     errors.password = "A senha deve ter no mínimo 6 caracteres.";
     return false;
   }
@@ -135,11 +132,11 @@ function validatePassword() {
 
 const isFormValid = computed(() => {
   return (
-    email.value.trim() &&
-    password.value.trim() &&
-    password.value.length >= 6 &&
-    !errors.email &&
-    !errors.password
+    form.email.trim() &&
+    form.password.trim() &&
+    form.password.length >= 6 &&
+    errors.email  === "" &&
+    errors.password  === "" 
   );
 });
 
@@ -149,42 +146,31 @@ function validateForm() {
   return emailValid && passwordValid;
 }
 
-async function handleLogin() {
+const handleLogin = async () => {
   if (!validateForm()) return;
 
   try {
     // chamada para a API de login
-    const response = await fetch("http://localhost:3000/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: email.value,
-        password: password.value,
-      }),
-    });
+    const response = await api.post("/users/login", form);
 
-    if (response.status === 401) {
-      errors.api = "Email ou senha incorretos.";
-      return;
+    if (response){
+      // salva o token no localStorage
+      localStorage.setItem("token", response.data.token);
+      router.push("/dashboard"); 
     }
+    else{    
+      if (response.status === 401) {
+        errors.api = "Email ou senha incorretos.";
+        return;
+      }
 
-    if (!response.ok) {
-      errors.api = "Erro ao conectar com o servidor.";
-      return;
-    }
-
-    const data = await response.json();
-
-    // salva o token no localStorage
-    localStorage.setItem("token", data.token);
-
-    showNotification.value = true;
-
-    setTimeout(() => {
-      router.push("/dashboard"); // página futura
-    }, 2000);
+      if (!response.ok) {
+        errors.api = "Erro ao conectar com o servidor.";
+        return;
+      }
+  }
   } catch (error) {
-    errors.api = error.message || "Erro ao realizar login.";
+    errors.api = error.response.data.message || "Erro ao realizar login.";
   }
 }
 </script>
