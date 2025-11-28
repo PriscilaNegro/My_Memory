@@ -16,7 +16,7 @@
       <div class="container main-content">
         <p class="main-subtitle mb-4 text-center">Esses são seus itens cadastrados:</p>
 
-        <!-- 🔍 Pesquisa no DESKTOP -->
+        <!-- Pesquisa no DESKTOP -->
         <div class="search-bar d-none d-md-flex justify-content-end align-items-center mb-3 gap-2">
           <input 
             v-model="searchQuery" 
@@ -47,7 +47,7 @@
               <tbody>
                 <tr v-for="item in filteredItems" :key="item.id">
                   <td>{{ item.name }}</td>
-                  <td>{{ item.location }}</td>
+                  <td>{{ item.location_name }}</td>
                   <td>{{ item.datetime }}</td>
                   <td>
                     <button class="btn btn-sm btn-warning me-2" @click="openEditModal(item)">Editar</button>
@@ -62,7 +62,7 @@
           Nenhum item encontrado para a pesquisa.
         </div>
 
-        <!-- 🔍 Pesquisa no MOBILE -->
+        <!--  Pesquisa no MOBILE -->
         <div class="search-bar d-flex d-md-none justify-content-center align-items-center gap-2 mt-3 flex-wrap">
           <input 
             v-model="searchQuery" 
@@ -86,7 +86,7 @@
       </div>
     </div>
 
-    <!-- ========== MODAIS (sem alteração) ========== -->
+    <!-- MODAIS  -->
 
     <!-- Modal Adicionar Item -->
     <div class="modal fade" id="addModal" tabindex="-1">
@@ -104,9 +104,9 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Local Armazenado</label>
-                <select v-model="newItem.location" class="form-select" required>
+                <select v-model="newItem.location_id" class="form-select" required>
                   <option disabled value="">Selecione um local</option>
-                  <option v-for="loc in locations" :key="loc" :value="loc">{{ loc }}</option>
+                  <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
                 </select>
               </div>
               <button type="submit" class="btn btn-primary mt-3">Adicionar</button>
@@ -166,9 +166,9 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Local Armazenado</label>
-                <select v-model="selectedItem.location" class="form-select" required>
+                <select v-model="selectedItem.location_id" class="form-select" required>
                   <option disabled value="">Selecione um local</option>
-                  <option v-for="loc in locations" :key="loc" :value="loc">{{ loc }}</option>
+                  <option v-for="loc in locations" :key="loc" :value="loc.id">{{ loc.name }}</option>
                 </select>
               </div>
               <button type="submit" class="btn btn-primary">Salvar</button>
@@ -228,18 +228,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import api from "../api";
 import * as bootstrap from "bootstrap";
 
 const user = ref({ name: "Priscila", photo: "" });
-const items = ref([
-  { id: 1, name: "Notebook", location: "Mesa do escritório", datetime: "11/09/2025 12:30" },
-  { id: 2, name: "Chave do carro", location: "Porta da sala", datetime: "11/09/2025 13:45" },
-]);
-
-const locations = ref(["Mesa do escritório", "Porta da sala"]);
+const items = ref([]);
+const locations = ref([]);
 const newLocation = ref("");
-const newItem = ref({ name: "", location: "" });
+const newItem = ref({ name: "", location_id: "" });
 
 let addModal = null;
 let editModal = null;
@@ -247,16 +244,48 @@ let deleteModal = null;
 let locationModal = null;
 let deleteLocationModal = null;
 
-const selectedItem = ref({ id: null, name: "", location: "" });
+const selectedItem = ref({ id: null, name: "", location_id: "" });
 const itemToDelete = ref(null);
 const locationToDelete = ref(null);
 const linkedItems = ref([]);
 
-// 🔍 Estado da pesquisa
+// Estado da pesquisa
 const searchQuery = ref("");
 const searchCategory = ref("all");
 
-// 🧮 Computed para filtragem
+// Função para buscar locais do backend
+const fetchLocations = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await api.get("/locations", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    locations.value = response.data;
+  } catch (err) {
+    console.error("Erro ao buscar locais:", err);
+  }
+};
+
+// Função para buscar itens
+const fetchItems = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await api.get("/items", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    items.value = response.data;
+  } catch (err) {
+    console.error("Erro ao buscar itens:", err);
+  }
+};
+
+// Assim que o componente carregar, busca tudo
+onMounted(async () => {
+  await fetchItems();
+  await fetchLocations();
+});
+
+// Computed para filtragem
 const filteredItems = computed(() => {
   if (!searchQuery.value) return items.value;
   const query = searchQuery.value.toLowerCase();
@@ -278,20 +307,36 @@ const filteredItems = computed(() => {
   });
 });
 
-// ========== Métodos dos modais (mesmos que você já tinha) ==========
+// Métodos dos modais
 const openAddModal = () => {
   newItem.value = { name: "", location: "" };
   if (!addModal) addModal = new bootstrap.Modal(document.getElementById("addModal"));
   addModal.show();
 };
 
-const saveNewItem = () => {
-  const id = items.value.length ? Math.max(...items.value.map(i => i.id)) + 1 : 1;
-  const now = new Date();
-  const datetime = now.toLocaleString();
-  items.value.push({ id, ...newItem.value, datetime });
-  localStorage.setItem("items", JSON.stringify(items.value));
-  addModal.hide();
+const saveNewItem = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    // montar payload conforme o model espera
+    const payload = {
+      name: newItem.value.name,
+      location_id: newItem.value.location_id,
+      image: null,        // ou enviar se tiver
+      description: null,  // ou enviar se tiver
+    };
+
+    await api.post("/items", payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // melhor atualizar a lista inteira para garantir nomes (location_name)
+    await fetchItems();
+
+    newItem.value = { name: "", location_id: "" };
+    addModal.hide();
+  } catch (error) {
+    console.error("Erro ao adicionar item:", error.response?.data || error);
+  }
 };
 
 const openEditModal = (item) => {
@@ -300,15 +345,25 @@ const openEditModal = (item) => {
   editModal.show();
 };
 
-const updateItem = () => {
-  const index = items.value.findIndex(i => i.id === selectedItem.value.id);
-  if (index !== -1) {
-    const now = new Date();
-    const datetime = now.toLocaleString();
-    items.value[index] = { ...selectedItem.value, datetime };
-    localStorage.setItem("items", JSON.stringify(items.value));
+const updateItem = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const payload = {
+      name: selectedItem.value.name,
+      location_id: selectedItem.value.location_id,
+      image: selectedItem.value.image ?? null,
+      description: selectedItem.value.description ?? null,
+    };
+
+    await api.put(`/items/${selectedItem.value.id}`, payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    await fetchItems();
+    editModal.hide();
+  } catch (error) {
+    console.error("Erro ao atualizar item:", error.response?.data || error);
   }
-  editModal.hide();
 };
 
 const openDeleteModal = (item) => {
@@ -317,12 +372,17 @@ const openDeleteModal = (item) => {
   deleteModal.show();
 };
 
-const confirmDelete = () => {
-  if (itemToDelete.value) {
+const confirmDelete = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    await api.delete(`/items/${itemToDelete.value.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     items.value = items.value.filter(i => i.id !== itemToDelete.value.id);
-    localStorage.setItem("items", JSON.stringify(items.value));
+    deleteModal.hide();
+  } catch (error) {
+    console.error("Erro ao deletar item:", error);
   }
-  deleteModal.hide();
 };
 
 const openLocationModal = () => {
@@ -331,30 +391,50 @@ const openLocationModal = () => {
   locationModal.show();
 };
 
-const saveNewLocation = () => {
-  locations.value.push(newLocation.value);
-  localStorage.setItem("locations", JSON.stringify(locations.value));
-  newLocation.value = "";
+const saveNewLocation = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const payload = { name: newLocation.value };
+
+    const response = await api.post("/locations", payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // adiciona o local recém-criado à lista reativa
+    locations.value.push(response.data);
+
+    newLocation.value = "";
+  } catch (error) {
+    console.error("Erro ao adicionar local:", error.response?.data || error);
+  }
 };
 
-const openDeleteLocationModal = (loc, index) => {
-  locationToDelete.value = { name: loc, index };
+const openDeleteLocationModal = (loc) => {
+  locationToDelete.value = loc;
   linkedItems.value = items.value.filter(item => item.location === loc);
-  if (!deleteLocationModal) deleteLocationModal = new bootstrap.Modal(document.getElementById("deleteLocationModal"));
+  if (!deleteLocationModal) {
+    deleteLocationModal = new bootstrap.Modal(document.getElementById("deleteLocationModal"));
+  }
   deleteLocationModal.show();
 };
 
-const confirmDeleteLocation = () => {
-  if (locationToDelete.value) {
-    const removed = locations.value.splice(locationToDelete.value.index, 1);
-    items.value.forEach(item => {
-      if (item.location === removed[0]) item.location = "";
+const confirmDeleteLocation = async () => {
+  if (!locationToDelete.value) return;
+
+  try {
+    const token = localStorage.getItem("token");
+    await api.delete(`/locations/${locationToDelete.value.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
     });
-    localStorage.setItem("locations", JSON.stringify(locations.value));
-    localStorage.setItem("items", JSON.stringify(items.value));
+
+    await fetchLocations(); // atualiza a lista
+    deleteLocationModal.hide();
+  } catch (error) {
+    console.error("Erro ao deletar localização:", error);
   }
-  deleteLocationModal.hide();
 };
+
+
 </script>
 
 <style scoped>
