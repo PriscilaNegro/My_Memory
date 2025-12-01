@@ -1,87 +1,81 @@
 <template>
-  <div class="container mt-5">
-    <h1>Cadastro My Memory 🧠</h1>
-    <p>Preencha os dados abaixo para criar sua conta:</p>
+  <div class="register-page">
 
-    <form v-on:submit.prevent="handleRegister" class="mt-4">
-      
-      <div class="mb-3 text-start">
-        <label for="name" class="form-label"> Nome:</label>
+    <h1 class="title"><span>Crie sua Conta</span></h1>
+    <p class="subtitle">Preencha os dados abaixo para começar</p>
+
+    <form v-on:submit.prevent="handleRegister" class="form-box">
+
+      <div class="input-group">
+        <label for="name">Nome</label>
         <input
           type="text"
           id="name"
           v-model="form.name"
-          class="form-control"
           placeholder="Digite seu nome"
           required
         />
-        <p v-if="form.name.length > 0 && form.name.length < 3" class="text-danger mt-1">
+        <p v-if="form.name.length > 0 && form.name.length < 3" class="error-msg">
           O nome deve ter no mínimo 3 caracteres.
         </p>
       </div>
 
-      <div class="mb-3 text-start">
-        <label for="email" class="form-label"> Email:</label>
+      <div class="input-group">
+        <label for="email">E-mail</label>
         <input
           type="email"
           id="email"
           v-model="form.email"
-          class="form-control"
-          placeholder="Digite seu email"
+          placeholder="Digite seu e-mail"
           required
         />
-        <p v-if="errors.email" class="text-danger mt-1">{{ errors.email }}</p>
+        <p v-if="errors.email" class="error-msg">{{ errors.email }}</p>
       </div>
 
-      <div class="mb-3 text-start">
-        <label for="password" class="form-label"> Senha:</label>
+      <div class="input-group">
+        <label for="password">Senha</label>
         <input
           type="password"
           id="password"
           v-model="form.password"
-          class="form-control"
           placeholder="Digite sua senha"
           required
         />
-        <p v-if="form.password.length > 0 && form.password.length < 6" class="text-danger mt-1">
+        <p v-if="form.password.length > 0 && form.password.length < 6" class="error-msg">
           A senha deve ter no mínimo 6 caracteres.
         </p>
       </div>
 
-      <div class="mb-3 text-start">
-        <label for="confirmPassword" class="form-label"> Confirmar Senha:</label>
+      <div class="input-group">
+        <label for="confirmPassword">Confirmar Senha</label>
         <input
           type="password"
           id="confirmPassword"
           v-model="form.confirmPassword"
-          class="form-control"
           placeholder="Confirme sua senha"
           required
         />
-        <p v-if="errors.password" class="text-danger mt-1">{{ errors.password }}</p>
+        <p v-if="errors.password" class="error-msg">{{ errors.password }}</p>
       </div>
 
-      <div class="text-center mt-3">
-        <button type="submit" class="btn-home">Cadastrar</button>
+      <div class="btn-area">
+        <button type="submit" class="btn-main">Cadastrar</button>
       </div>
+
     </form>
+
+    <Notification :visible="showNotification" message="Cadastro realizado com sucesso! Redirecionando..." />
   </div>
-  <Notification :visible="showNotification" message="Cadastro realizado com sucesso! Redirecionando..." />
 </template>
 
 <script setup>
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import Notification from '../views/Notification.vue';
-
-//Importar toda vez que for chamar o backend
 import api from "../api";
 
 const router = useRouter();
 const showNotification = ref(false);
-
-//Reactive usar para Formulário com vários campos
-//Ref Valor único (contador, toggle, input isolado)
 
 const form = reactive ({
   name: '',
@@ -91,17 +85,16 @@ const form = reactive ({
 });
 
 const errors = reactive({
-   email: "",
-   password: "",
+  email: "",
+  password: "",
 });
 
 const allowedDomains = ["gmail.com", "hotmail.com", "outlook.com", "yahoo.com"];
 
 const handleRegister = async () => {
-
   if (form.name.trim().length < 3) {
-  errors.name = "O nome deve ter no mínimo 3 caracteres.";
-  return;
+    errors.name = "O nome deve ter no mínimo 3 caracteres.";
+    return;
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -125,64 +118,178 @@ const handleRegister = async () => {
     errors.password = "As senhas não conferem.";
     return;
   }
-  
-  // Aqui chama API para salvar o usuário
+
   try {
-    //endpoint do backend, sempre usar await
     const response = await api.post("/users", form);
+
     if (response) {
       form.name = "";
       form.email = "";
       form.password = "";
       form.confirmPassword = "";
 
-      showNotification.value = true; 
+      showNotification.value = true;
       setTimeout(() => {
         router.push('/login');
       }, 1500);
     }
+
   } catch (error) {
     if (error.response && error.response.data) {
-        // Captura o erro enviado pelo backend em error.response.data
-        errors.email = error.response.data.message;
-      } else {
-        console.error("Erro inesperado:", error);
-      }
+      errors.email = error.response.data.message;
+    } else {
+      console.error("Erro inesperado:", error);
+    }
   }
 }
 </script>
 
 <style scoped>
-h1 {
-  color: #000000;
-  text-align: center;
-}
-
-p {
-  text-align: center;
-  font-size: 1.125rem;
-  margin-bottom: 2rem;
-  font-family: 'Arial', sans-serif;
-}
-
-.container {
-  max-width: 700px;
-  margin: auto;
-}
-
-.btn-home {
-  width: 160px; 
-  padding: 12px 0; 
-  font-size: 1.25rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background-color: #de7288a8;
+.register-page {
+  height: 100vh;
+  background: transparent;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px 20px;
   color: white;
-  transition: background 0.3s ease;
 }
 
-.btn-home:hover {
-  background-color: #e05a75d6;
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 5px;
+  text-align: center;
+  white-space: nowrap;
 }
+
+.title span {
+  color: #f3b2ff;
+  text-shadow: 0 0 15px #c73afa;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #ffe6f3;
+  margin-bottom: 20px;
+  margin-top: 5px;
+}
+
+.form-box {
+  width: 100%;
+  max-width: 420px;
+  background: transparent;
+  padding: 0 10px;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+label {
+  color: #e7baff;
+  margin-bottom: 5px;
+  display: block;
+  font-size: 0.95rem;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  background: transparent !important;
+  border: 2px solid #b654ff;
+  border-radius: 10px !important;
+  color: #c7d9ff;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 0 0 8px 1px rgba(182, 84, 255, 0.5);
+  transition: 0.3s ease;
+}
+
+input::placeholder {
+  color: #c9a6ff;
+}
+
+input:focus {
+  border-color: #8db3ff;
+  box-shadow: 0 0 12px #8db3ff;
+}
+
+.error-msg {
+  color: white;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.btn-main {
+  width: 160px;
+  padding: 12px 0;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  background: transparent;
+  color: #d796ff;
+  border: 2px solid #b654ff;
+  box-shadow: 0 0 10px rgba(182, 84, 255, 0.5);
+  transition: 0.3s ease;
+}
+
+.btn-main:hover {
+  transform: scale(1.05);
+  color: #4f87ff;
+  border-color: #8db3ff;
+  box-shadow: 0 0 15px rgba(141, 173, 255, 0.9);
+}
+
+.btn-area {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+button { 
+  margin-top: 20px;
+ }
+
+ @media (max-width: 360px) {
+  .title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-page {
+    height: 100vh;      
+    padding-bottom: 20px; 
+    justify-content: flex-start;
+    margin-top: 10vh; 
+  }
+
+  .title {
+    margin-top: 0; 
+    margin-bottom: 10px; 
+  }
+
+  .subtitle {
+    margin-top: 10px; 
+    margin-bottom: 20px;
+  }
+
+  .btn-area {
+    margin-bottom: 10px;   
+  }
+
+  button {
+    margin-top: 15px;    
+  }
+}
+
+
 </style>
