@@ -21,7 +21,7 @@ html, body, #app {
   width: 100%;
   font-family: 'Arial', sans-serif;
   background: linear-gradient(180deg, #200029, #320043, #1d006c); 
-  overflow-y: hidden; 
+  overflow-y: hidden;
 }
 
 html::-webkit-scrollbar,

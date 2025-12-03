@@ -2,7 +2,7 @@
   <div class="login-page">
 
     <h1 class="title"><span>Entrar</span></h1>
-    <p class="subtitle">Bem-vindo de volta! Acesse sua conta</p>
+    <p class="subtitle">Acesse sua conta.</p>
 
     <form @submit.prevent="handleLogin" class="form-box">
 
