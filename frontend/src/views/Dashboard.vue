@@ -64,8 +64,8 @@
                 <td>{{ item.location_name }}</td>
                 <td>{{ item.datetime }}</td>
                 <td>
-                  <button class="btn btn-sm table-edit-btn me-2" @click="openEdit(item)">Editar</button>
-                  <button class="btn btn-sm btn-outline-danger" @click="openDelete(item)">Excluir</button>
+                  <button class="btn btn-sm table-edit-btn table-action-btn me-2" @click="openEdit(item)">Editar</button>
+                  <button class="btn btn-sm btn-outline-danger table-action-btn" @click="openDelete(item)">Excluir</button>
                 </td>
               </tr>
             </tbody>
@@ -323,10 +323,6 @@ const confirmDeleteLocation = async () => {
 </script>
 
 <style scoped>
-body, #app {
-  background: linear-gradient(180deg, #12002f, #000428);
-  min-height: 100vh;
-}
 
 .dashboard-header {
   display: flex;
@@ -409,21 +405,27 @@ body, #app {
 }
 
 .main-wrapper {
-  margin-top: 30px;
+  position: relative;
+  margin-top: 90px; 
+  width: 100%;
   display: flex;
   justify-content: center;
 }
 
 .main-content {
-  margin-top: 40px;
+  margin-top: 0 !important;
+  margin-bottom: 50px;
   background: rgba(10, 0, 32, 0.6);
   backdrop-filter: blur(6px);
   padding: 25px;
+  padding-top: 20px !important;
+  padding-right: 16px; 
   border-radius: 15px;
   width: 100%;
   max-width: 1000px;
   box-shadow: 0 0 25px rgba(160, 32, 240, 0.15);
   color: #c7d9ff;
+  flex: 1;
 }
 
 .table {
@@ -431,6 +433,10 @@ body, #app {
   background: transparent;
   overflow: hidden;
   color:  #c7d9ff;
+}
+
+.table-responsive {
+  overflow-y: visible !important;
 }
 
 .table thead th {
@@ -476,19 +482,35 @@ body, #app {
   border-bottom: 1px solid rgba(6, 170, 246, 0.25) !important;
 }
 
-.table-edit-btn {
+.table-action-btn {
   background: transparent;
-  border: 1px solid #ffbb00; 
-  padding: 10px;
-  color: #ffbb00 ;
-  padding: 6px 14px;
+  padding: 6px 14px; 
   font-size: 14px;
   cursor: pointer;
   transition: 0.3s ease;
 }
 
+.table-edit-btn {
+  border: 1px solid #ffbb00; 
+  color: #ffbb00 ;
+}
+
+.table-action-btn:hover {
+  /* Deixado vazio, pois o hover será aplicado nas classes específicas */
+}
+
 .table-edit-btn:hover {
   background: #ffbb00;
+  color: white;
+}
+
+.btn-outline-danger.table-action-btn {
+  border: 1px solid #dc3545; 
+  color: #dc3545; 
+}
+
+.btn-outline-danger.table-action-btn:hover {
+  background: #dc3545;
   color: white;
 }
 
@@ -671,7 +693,6 @@ body, #app {
 @media (min-width: 769px) {
   .main-wrapper {
     max-height: calc(100vh - 70px);
-    overflow-y: auto;
   }
 }
 
