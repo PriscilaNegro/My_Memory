@@ -15,188 +15,191 @@
     </div>
   </header>
 
-  <div class="top-actions" role="toolbar" aria-label="Ações rápidas">
-    <button type="button" class="neon-btn" @click="showAddModal = true">+ Novo Item</button>
-    <button type="button" class="neon-btn" @click="showLocationModal = true">+ Novo Local</button>
-  </div>
+  <div class="dashboard-content">
 
-  <!-- Pesquisa MOBILE: logo após os botões -->
-  <div class="search-bar d-flex d-md-none justify-content-center align-items-center gap-2 mt-3 flex-wrap">
-    <input v-model="searchQuery" type="text" placeholder="Pesquisar..." class="form-control w-100" />
-    <select v-model="searchCategory" class="form-select w-100">
-      <option value="all">Todos</option>
-      <option value="name">Itens</option>
-      <option value="location">Locais</option>
-      <option value="datetime">Datas</option>
-    </select>
-  </div>
-
-  <div class="main-wrapper d-flex justify-content-center">
-    <div class="container main-content">
-      <p class="main-subtitle mb-4 text-center">Esses são seus itens cadastrados:</p>
-
-      <!-- Pesquisa DESKTOP -->
-      <div class="search-bar d-none d-md-flex justify-content-end align-items-center mb-3 gap-2">
-        <input v-model="searchQuery" type="text" placeholder="Pesquisar..." class="form-control w-auto" />
-        <select v-model="searchCategory" class="form-select w-auto">
-          <option value="all">Todos</option>
-          <option value="name">Itens</option>
-          <option value="location">Locais</option>
-          <option value="datetime">Datas</option>
-        </select>
-      </div>
-
-      <!-- Tabela filtrada -->
-      <div v-if="filteredItems.length">
-        <div class="table-responsive">
-          <table class="table table-hover table-bordered align-middle text-center mt-3">
-            <thead class="custom-header">
-              <tr>
-                <th>Item</th>
-                <th>Local Armazenado</th>
-                <th>Data/Hora</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in filteredItems" :key="item.id">
-                <td>{{ item.name }}</td>
-                <td>{{ item.location_name }}</td>
-                <td>{{ item.datetime }}</td>
-                <td>
-                  <button class="btn btn-sm table-edit-btn table-action-btn me-2" @click="openEdit(item)">Editar</button>
-                  <button class="btn btn-sm btn-outline-danger table-action-btn" @click="openDelete(item)">Excluir</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div v-else class="alert alert-warning mt-3">
-        Nenhum item encontrado para a pesquisa.
-      </div>
+    <div class="top-actions" role="toolbar" aria-label="Ações rápidas">
+      <button type="button" class="neon-btn" @click="showAddModal = true">+ Novo Item</button>
+      <button type="button" class="neon-btn" @click="showLocationModal = true">+ Novo Local</button>
     </div>
-  </div>
 
-  <!-- Adicionar Item -->
-  <div v-if="showAddModal" class="modal-overlay" @click.self="showAddModal = false">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Adicionar Item</h5>
-          <button type="button" class="btn-close" @click="showAddModal = false"></button>
-        </div>
-        <div class="modal-body">
-          <form @submit.prevent="saveNewItem">
-            <div class="mb-3">
-              <label class="form-label">Nome do Item</label>
-              <input v-model="newItem.name" type="text" class="form-control" required />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Local Armazenado</label>
-              <select v-model="newItem.location_id" class="form-select" required>
-                <option disabled value="">Selecione um local</option>
-                <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Adicionar</button>
-          </form>
-        </div>
-      </div>
+    <!-- Pesquisa MOBILE -->
+    <div class="search-bar d-flex d-md-none justify-content-center align-items-center gap-2 mt-3 flex-wrap">
+      <input v-model="searchQuery" type="text" placeholder="Pesquisar..." class="form-control w-100" />
+      <select v-model="searchCategory" class="form-select">
+        <option value="all">Todos</option>
+        <option value="name">Itens</option>
+        <option value="location">Locais</option>
+        <option value="datetime">Datas</option>
+      </select>
     </div>
-  </div>
 
-  <!-- Editar Item -->
-  <div v-if="showEditModal" class="modal-overlay" @click.self="showEditModal = false">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Editar Item</h5>
-          <button type="button" class="btn-close" @click="showEditModal = false"></button>
-        </div>
-        <div class="modal-body">
-          <form @submit.prevent="updateItem">
-            <div class="mb-3">
-              <label class="form-label">Nome do Item</label>
-              <input v-model="selectedItem.name" type="text" class="form-control" required />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Local Armazenado</label>
-              <select v-model="selectedItem.location_id" class="form-select" required>
-                <option disabled value="">Selecione um local</option>
-                <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Salvar</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+    <div class="main-wrapper d-flex justify-content-center">
+      <div class="container-fluid main-content">
+        <p class="main-subtitle mb-4 text-center">Esses são seus itens cadastrados:</p>
 
-  <!-- Excluir Item -->
-  <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title text-danger">Excluir Item</h5>
-          <button type="button" class="btn-close" @click="showDeleteModal = false"></button>
+        <!-- Pesquisa DESKTOP -->
+        <div class="search-bar d-none d-md-flex justify-content-end align-items-center mb-3 gap-2">
+          <input v-model="searchQuery" type="text" placeholder="Pesquisar..." class="form-control w-auto" />
+          <select v-model="searchCategory" class="form-select w-auto">
+            <option value="all">Todos</option>
+            <option value="name">Itens</option>
+            <option value="location">Locais</option>
+            <option value="datetime">Datas</option>
+          </select>
         </div>
-        <div class="modal-body">
-          Tem certeza que deseja excluir o item <strong>{{ itemToDelete?.name }}</strong>?
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" @click="showDeleteModal = false">Cancelar</button>
-          <button class="btn btn-danger" @click="confirmDelete">Excluir</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Gerenciar Locais -->
-  <div v-if="showLocationModal" class="modal-overlay" @click.self="showLocationModal = false">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Gerenciar Locais</h5>
-          <button type="button" class="btn-close" @click="showLocationModal = false"></button>
-        </div>
-        <div class="modal-body">
-          <form @submit.prevent="saveNewLocation">
-            <div class="mb-3">
-              <label class="form-label">Nome do Local</label>
-              <input v-model="newLocation" type="text" class="form-control" required />
-            </div>
-            <button type="submit" class="btn btn-primary">Adicionar Local</button>
-          </form>
-          <ul class="list-group mt-3">
-            <li v-for="(loc, index) in locations" :key="loc.id" class="list-group-item d-flex justify-content-between align-items-center">
-              {{ loc.name }}
-              <button class="btn btn-sm btn-outline-danger" @click="openDeleteLocation(loc)">Excluir</button>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Excluir Local -->
-  <div v-if="showDeleteLocationModal" class="modal-overlay" @click.self="showDeleteLocationModal = false">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title text-danger">Excluir Local</h5>
-          <button type="button" class="btn-close" @click="showDeleteLocationModal = false"></button>
-        </div>
-        <div class="modal-body">
-          Tem certeza que deseja excluir o local <strong>{{ locationToDelete?.name }}</strong>?
-          <div v-if="linkedItems.length" class="alert alert-warning mt-3">
-            Atenção ⚠️ Este local está associado a <strong>{{ linkedItems.length }}</strong> item(s). Eles perderão a referência ao local.
+        <!-- Tabela filtrada -->
+        <div v-if="filteredItems.length">
+          <div class="table-wrapper table-responsive">
+            <table class="table table-hover table-bordered align-middle text-center mt-3">
+              <thead class="custom-header">
+                <tr>
+                  <th>Item</th>
+                  <th>Local Armazenado</th>
+                  <th>Data/Hora</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in filteredItems" :key="item.id">
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.location_name }}</td>
+                  <td>{{ item.datetime  || 'N/A'}}</td>
+                  <td>
+                    <button class="btn btn-sm table-edit-btn table-action-btn me-2" @click="openEdit(item)">Editar</button>
+                    <button class="btn btn-sm btn-outline-danger table-action-btn" @click="openDelete(item)">Excluir</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" @click="showDeleteLocationModal = false">Cancelar</button>
-          <button class="btn btn-danger" @click="confirmDeleteLocation">Excluir</button>
+        <div v-else class="alert alert-warning mt-3">
+          Nenhum item encontrado para a pesquisa.
+        </div>
+      </div>
+    </div>
+
+    <!-- Adicionar Item -->
+    <div v-if="showAddModal" class="modal-overlay" @click.self="showAddModal = false">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Adicionar Item</h5>
+            <button type="button" class="btn-close" @click="showAddModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="saveNewItem">
+              <div class="mb-3">
+                <label class="form-label">Nome do Item</label>
+                <input v-model="newItem.name" type="text" class="form-control" required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Local Armazenado</label>
+                <select v-model="newItem.location_id" class="form-select" required>
+                  <option disabled value="">Selecione um local</option>
+                  <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary mt-3">Adicionar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editar Item -->
+    <div v-if="showEditModal" class="modal-overlay" @click.self="showEditModal = false">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Item</h5>
+            <button type="button" class="btn-close" @click="showEditModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="updateItem">
+              <div class="mb-3">
+                <label class="form-label">Nome do Item</label>
+                <input v-model="selectedItem.name" type="text" class="form-control" required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Local Armazenado</label>
+                <select v-model="selectedItem.location_id" class="form-select" required>
+                  <option disabled value="">Selecione um local</option>
+                  <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Excluir Item -->
+    <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-danger">Excluir Item</h5>
+            <button type="button" class="btn-close" @click="showDeleteModal = false"></button>
+          </div>
+          <div class="modal-body">
+            Tem certeza que deseja excluir o item <strong>{{ itemToDelete?.name }}</strong>?
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" @click="showDeleteModal = false">Cancelar</button>
+            <button class="btn btn-danger" @click="confirmDelete">Excluir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gerenciar Locais -->
+    <div v-if="showLocationModal" class="modal-overlay" @click.self="showLocationModal = false">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Gerenciar Locais</h5>
+            <button type="button" class="btn-close" @click="showLocationModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="saveNewLocation">
+              <div class="mb-3">
+                <label class="form-label">Nome do Local</label>
+                <input v-model="newLocation" type="text" class="form-control" required />
+              </div>
+              <button type="submit" class="btn btn-primary">Adicionar Local</button>
+            </form>
+            <ul class="list-group mt-3">
+              <li v-for="(loc, index) in locations" :key="loc.id" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ loc.name }}
+                <button class="btn btn-sm btn-outline-danger" @click="openDeleteLocation(loc)">Excluir</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Excluir Local -->
+    <div v-if="showDeleteLocationModal" class="modal-overlay" @click.self="showDeleteLocationModal = false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-danger">Excluir Local</h5>
+            <button type="button" class="btn-close" @click="showDeleteLocationModal = false"></button>
+          </div>
+          <div class="modal-body">
+            Tem certeza que deseja excluir o local <strong>{{ locationToDelete?.name }}</strong>?
+            <div v-if="linkedItems.length" class="alert alert-warning mt-3">
+              Atenção! Este local está associado a <strong>{{ linkedItems.length }}</strong> item(s). Eles perderão a referência ao local.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" @click="showDeleteLocationModal = false">Cancelar</button>
+            <button class="btn btn-danger" @click="confirmDeleteLocation">Excluir</button>
+          </div>
         </div>
       </div>
     </div>
@@ -236,7 +239,25 @@ const fetchItems = async () => {
   try {
     const token = localStorage.getItem("token");
     const response = await api.get("/items", { headers: { Authorization: `Bearer ${token}` } });
-    items.value = response.data;
+    items.value = response.data.map(item => {
+      let formattedDate = 'N/A';
+        if (item.created_at) {
+             // Cria um objeto Date a partir do string ISO
+             const date = new Date(item.created_at);
+             // Formata para o padrão DD/MM/AAAA HH:MM (excluindo segundos)
+             formattedDate = date.toLocaleDateString('pt-BR', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+             }).replace(',', '');
+        }
+        return {
+            ...item,
+            datetime: formattedDate
+        };
+    });
   } catch (err) { console.error(err); }
 };
 
@@ -278,7 +299,10 @@ const openDeleteLocation = (loc) => { locationToDelete.value = loc; linkedItems.
 const saveNewItem = async () => {
   try {
     const token = localStorage.getItem("token");
-    await api.post("/items", { name: newItem.value.name, location_id: newItem.value.location_id }, { headers: { Authorization: `Bearer ${token}` } });
+    await api.post("/items", {
+      name: newItem.value.name,
+      location_id: newItem.value.location_id }, 
+      { headers: { Authorization: `Bearer ${token}` } });
     await fetchItems();
     newItem.value = { name: "", location_id: "" };
     showAddModal.value = false;
@@ -288,10 +312,40 @@ const saveNewItem = async () => {
 const updateItem = async () => {
   try {
     const token = localStorage.getItem("token");
-    await api.put(`/items/${selectedItem.value.id}`, { name: selectedItem.value.name, location_id: selectedItem.value.location_id }, { headers: { Authorization: `Bearer ${token}` } });
-    await fetchItems();
+    const currentTimestamp = new Date().toISOString();
+    await api.put(`/items/${selectedItem.value.id}`, { 
+      name: selectedItem.value.name,
+      location_id: selectedItem.value.location_id,
+      created_at: currentTimestamp}, { headers: { Authorization: `Bearer ${token}` } });
+    
+    const index = items.value.findIndex(i => i.id === selectedItem.value.id);
+    
+    if (index !== -1) {
+        const date = new Date(currentTimestamp);
+        const formattedDate = date.toLocaleDateString('pt-BR', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit',
+         }).replace(',', '');
+         
+         items.value[index].name = selectedItem.value.name;
+         items.value[index].location_id = selectedItem.value.location_id;
+
+         const newLocation = locations.value.find(loc => loc.id === selectedItem.value.location_id);
+        if (newLocation) {
+             items.value[index].location_name = newLocation.name;
+        }
+
+        items.value[index].created_at = currentTimestamp; // Mantém o campo original
+        items.value[index].datetime = formattedDate; // Atualiza o campo de exibição
+    }
+
     showEditModal.value = false;
-  } catch (err) { console.error(err); }
+  } catch (err) { console.error(err);
+    await fetchItems();
+   }
 };
 
 const confirmDelete = async () => {
@@ -330,11 +384,17 @@ const confirmDeleteLocation = async () => {
   align-items: center;
   padding: 18px 25px;
   width: 100%;
-  background: transparent;
+  background:  #200029;
+  backdrop-filter: blur(4px);
   position: fixed;
   top: 0;
   left: 0;
   z-index: 2000;
+  height: 70px;
+}
+
+.dashboard-content {
+  padding-top: 75px;
 }
 
 .brain-logo {
@@ -376,10 +436,10 @@ const confirmDeleteLocation = async () => {
 }
 
 .top-actions {
-  margin-top: 100px;
   display: flex;
   gap: 15px;
   justify-content: center;
+  margin-bottom: 25px;
 }
 
 .neon-btn {
@@ -406,7 +466,7 @@ const confirmDeleteLocation = async () => {
 
 .main-wrapper {
   position: relative;
-  margin-top: 90px; 
+  margin-top: 0px; 
   width: 100%;
   display: flex;
   justify-content: center;
@@ -465,6 +525,20 @@ const confirmDeleteLocation = async () => {
   background: rgba(100, 28, 172, 0.5) !important;
 }
 
+.table-wrapper {
+  max-height: 450px;  
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.table-wrapper thead th {
+  position: sticky;
+  top: 0;
+  background: #1a0033;
+  color: white;
+  z-index: 10;
+}
+
 :deep(.table) {
   border-collapse: separate !important;
   border-spacing: 0 !important;
@@ -493,10 +567,6 @@ const confirmDeleteLocation = async () => {
 .table-edit-btn {
   border: 1px solid #ffbb00; 
   color: #ffbb00 ;
-}
-
-.table-action-btn:hover {
-  /* Deixado vazio, pois o hover será aplicado nas classes específicas */
 }
 
 .table-edit-btn:hover {
@@ -528,13 +598,17 @@ const confirmDeleteLocation = async () => {
 }
 
 .modal-overlay {
-  position: fixed;
-  top:0; left:0; right:0; bottom:0;
+  position: fixed !important;
+  top:0; 
+  left:0; 
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
   background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 5000;
+  z-index: 9999;
 }
 
 .modal-dialog {
@@ -698,17 +772,117 @@ const confirmDeleteLocation = async () => {
 
 @media (max-width: 768px) {
 
+    html, body {
+    overflow: hidden !important;
+    height: 100%;
+  }
+
+  .dashboard-content {
+    height: calc(100vh - 70px);
+    max-height: calc(100vh - 60px);
+    overflow: hidden !important;     
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+    padding-top: 20px;    
+    width: 100%;
+    max-width: 100%;      
+  }
+
   .top-actions {
     flex-direction: column;
-    margin-top: 110px;
+    margin-top: 0px;
+    margin-bottom: 20px;
+    align-items: center;
   }
 
   .brain-logo {
     width: 55px;
   }
 
-  .main-content {
-    padding: 18px;
+  .main-content .main-subtitle {
+    font-size: 14px; 
   }
+
+  .main-content .table th,
+  .main-content .table td {
+    font-size: 12px !important; 
+    padding: 6px 4px !important; 
+  }
+
+  .table-action-btn {
+    font-size: 10px;
+    margin-top: 5px;
+    padding: 3px 10px;
+  }
+
+  .main-content {
+    width: 98% !important;
+    max-width: none;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .main-wrapper {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 100vh;
+    overflow-x: hidden !important;
+  }
+
+  .search-bar {
+    margin-bottom: 25px; 
+  }
+
+  .search-bar .form-select {
+    width: 25% !important; 
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    padding: 8px 10px !important; 
+    line-height: 1.2 !important; 
+    font-size: 13px !important; 
+    height: auto !important; 
+    align-self: flex-start;
+  }
+  
+  .search-bar .form-control {
+    width: 100% !important;
+  }
+  
+  .table-wrapper {
+    max-height: 450px; 
+    overflow-y: auto !important;    
+    overflow-x: hidden !important; 
+    -webkit-overflow-scrolling: touch;
+    width: 100% !important;
+  }
+
+  table {
+    width: 100% !important;
+  }
+
+  .dashboard-header {
+    padding: 10px 15px;
+    height: 60px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+  }
+
+  .main-content .table {
+    table-layout: fixed; 
+    width: 100%;
+    word-wrap: break-word; 
+    white-space: normal;
+  }
+ 
+  .main-content .table thead th:nth-child(1) { width: 20%; } /* Item */
+  .main-content .table thead th:nth-child(2) { width: 35%; } /* Local Armazenado */
+  .main-content .table thead th:nth-child(3) { width: 25%; } /* Data/Hora */
+  .main-content .table thead th:nth-child(4) { width: 20%; } 
+
 }
 </style>
