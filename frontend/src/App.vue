@@ -41,7 +41,7 @@ watch(() => route.name, (newRouteName) => {
 }
 
 html, body, #app {
-  min-height: 100%;
+  min-height: 100vh;
   width: 100%;
   font-family: 'Arial', sans-serif;
   background: linear-gradient(180deg, #200029, #320043, #1d006c); 
