@@ -11,7 +11,8 @@ const PORT = process.env.PORT || 3333;
 
 app.use(
     cors({
-        origin: "http://localhost:5173", //frontend port
+        origin: ["http://localhost:5173", //frontend port
+        "https://mymemory2025.netlify.app"],
     })
 );
 
