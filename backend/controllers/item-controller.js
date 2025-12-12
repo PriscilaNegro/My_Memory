@@ -6,21 +6,36 @@ import LocationModel from "../models/location-model.js";
 // @route   POST /api/items
 // @access  Private
 export const createItem = asyncHandler(async (req, res) => {
-    const { name, location_id, image, description } = req.body;
+    let { name, location_id, image, description } = req.body;
     const user_id = req.user.id; // vem do validateToken
 
     if (!name || !location_id) {
-        res.status(400);
-        throw new Error("Nome e local são obrigatórios");
+      res.status(400);
+      throw new Error("Nome e local são obrigatórios.");
     }
 
-    const location = await LocationModel.findById(location_id);
+    // Se vier string (ex: "carteira"), criar novo local
+    const isNumeric = /^\d+$/.test(location_id);
 
-    if (!location) {
+    if (!isNumeric) {
+        const newLocation = await LocationModel.create({
+        name: location_id,
+        userId: user_id   // <- MUITO IMPORTANTE: seu model usa 'userId'
+        });
+
+        // Substituir pelo ID numérico criado
+        location_id = newLocation.id;
+    }
+
+    // Garantir que o ID existe (caso seja numérico)
+    const locationExists = await LocationModel.findById(location_id);
+
+    if (!locationExists) {
         res.status(400);
         throw new Error("A localização informada não existe.");
     }
 
+    // Criar item
     const newItem = await ItemModel.create({
         name,
         location_id,
@@ -30,7 +45,7 @@ export const createItem = asyncHandler(async (req, res) => {
     });
 
     res.status(201).json(newItem);
-});
+    });
 
 // @desc    Get item by id
 // @route   GET /api/items/:id
@@ -64,7 +79,7 @@ export const getItems = asyncHandler(async (req, res) => {
 export const updateItem = asyncHandler(async (req, res) => {
     const user_id = req.user.id;
     const { id } = req.params;
-    const { name, location_id, image, description } = req.body;
+    let { name, location_id, image, description } = req.body;
 
     const existingItem = await ItemModel.findById(id, user_id);
 
@@ -81,14 +96,23 @@ export const updateItem = asyncHandler(async (req, res) => {
     // Validar localização somente se fornecida
     let newLocationId = existingItem.location_id;
     if (location_id !== undefined) {
-        if (location_id === null) {
-            newLocationId = null; // Permite remover a localização
+        const isNumeric = /^\d+$/.test(location_id);
+        
+        if (!isNumeric) {
+            const newLocation = await LocationModel.create({
+                name: location_id,
+                userId: user_id,
+            });
+
+            newLocationId = newLocation.id;
         } else {
+            // Verifica se o ID realmente existe no banco
             const locationExists = await LocationModel.findById(location_id);
             if (!locationExists) {
                 res.status(400);
                 throw new Error(`Localização com ID ${location_id} não existe`);
             }
+
             newLocationId = location_id;
         }
     }
