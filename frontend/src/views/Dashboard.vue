@@ -96,7 +96,10 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Local Armazenado</label>
-                <select v-model="newItem.location_id" class="form-select" required>
+                <select id="locationSelect"
+                        v-model="newItem.location_id"
+                        class="form-select"
+                        required>
                   <option disabled value="">Selecione um local</option>
                   <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
                 </select>
@@ -209,6 +212,9 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import api from "../api";
+import TomSelect from "tom-select";
+
+let tomSelectInstance = null;
 
 const menuOpen = ref(false);
 const userName = localStorage.getItem("name") || "Usuário";
@@ -274,6 +280,76 @@ onMounted(async () => {
   await fetchLocations();
 });
 
+import { watch } from "vue";
+
+watch(showAddModal, (isOpen) => {
+  if (isOpen) {
+    setTimeout(() => {
+      if (!tomSelectInstance) {
+        tomSelectInstance = new TomSelect("#locationSelect", {
+          create: async (input) => {
+            try {
+              const token = localStorage.getItem("token");
+
+              const response = await api.post("/locations",
+                { name: input },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+
+              const newLocation = response.data;
+
+              // Adiciona no TomSelect
+              tomSelectInstance.addOption({
+                id: newLocation.id,
+                name: newLocation.name
+              });
+
+              tomSelectInstance.refreshOptions(false);
+
+              // Define como valor selecionado
+              tomSelectInstance.setValue(newLocation.id);
+
+              // Grava no formulário
+              newItem.value.location_id = newLocation.id;
+
+              // Atualiza lista local
+              locations.value.push(newLocation);
+
+              return newLocation.id; // TomSelect precisa disso
+            } catch (err) {
+              console.error("Erro ao criar local:", err);
+              alert("Erro ao criar novo local.");
+              return null;
+            }
+          },
+
+          valueField: "id",
+          labelField: "name",
+          searchField: "name",
+
+          onChange: (value) => {
+            newItem.value.location_id = Number(value);
+          }
+        });
+      }
+
+      // Carrega opções existentes
+      tomSelectInstance.clearOptions();
+      locations.value.forEach(loc => {
+        tomSelectInstance.addOption({ id: loc.id, name: loc.name });
+      });
+      tomSelectInstance.refreshOptions(false);
+
+    }, 50);
+  }
+  else {
+    if (tomSelectInstance) {
+      tomSelectInstance.destroy();
+      tomSelectInstance = null;
+    }
+  }
+});
+
 const filteredItems = computed(() => {
   if (!searchQuery.value) return items.value;
   const query = searchQuery.value.toLowerCase();
@@ -299,14 +375,31 @@ const openDeleteLocation = (loc) => { locationToDelete.value = loc; linkedItems.
 const saveNewItem = async () => {
   try {
     const token = localStorage.getItem("token");
+    console.log("Enviar payload newItem:", newItem.value);
+
     await api.post("/items", {
       name: newItem.value.name,
       location_id: newItem.value.location_id }, 
       { headers: { Authorization: `Bearer ${token}` } });
+
     await fetchItems();
     newItem.value = { name: "", location_id: "" };
     showAddModal.value = false;
-  } catch (err) { console.error(err); }
+  } catch (err) {
+    console.error("Erro saveNewItem:", err);
+
+    if (err.response) {
+      console.error("err.response.status:", err.response.status);
+      console.error("err.response.data:", err.response.data);
+      alert(
+        "Erro ao salvar item: " +
+          (err.response.data?.message ||
+            JSON.stringify(err.response.data))
+      );
+    } else {
+      alert("Erro ao salvar item. Veja console.");
+    }
+  }
 };
 
 const updateItem = async () => {
@@ -572,6 +665,92 @@ const confirmDeleteLocation = async () => {
 .table-edit-btn:hover {
   background: #ffbb00;
   color: white;
+}
+
+/* Estilo TomSelect */
+:deep(.ts-wrapper.single .ts-control),
+:deep(.ts-control) {
+  background: rgba(10, 0, 32, 0.3) !important;
+  border: 2px solid #a020f0 !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  font-size: 16px;
+  color: #c7d9ff !important;
+  box-shadow: 0 0 6px #9b4dff !important;
+  transition: 0.3s ease;
+  -webkit-appearance: none !important;
+}
+
+:deep(.ts-control input::-webkit-input-placeholder) {
+  color: #c7d9ff !important;
+}
+
+:deep(.ts-control:hover),
+:deep(.ts-control:focus),
+:deep(.ts-wrapper.single .ts-control.focus) {
+  background: rgba(10, 0, 32, 0.45) !important;
+  border-color: #5a00ff !important;
+  box-shadow: 0 0 12px #a020f0 !important;
+}
+
+/* Placeholder e texto interno */
+:deep(.ts-control input),
+:deep(.ts-control .item),
+:deep(.ts-control::placeholder),
+:deep(.ts-control input::-webkit-input-placeholder){
+  color: #c7d9ff !important;
+}
+
+:deep(.ts-wrapper.single .ts-control::after) {
+  border-color: #c7d9ff transparent transparent !important;
+}
+
+:deep(.ts-wrapper.single .ts-control.focus::after) {
+  border-color: #a020f0 transparent transparent !important;
+}
+
+:deep(.ts-dropdown) {
+  background: rgba(10, 0, 32, 0.9) !important;
+  border: 1px solid #a020f0 !important;
+  border-top: none !important;
+  box-shadow: 0 0 15px rgba(160, 32, 240, 0.45);
+}
+
+:deep(.ts-dropdown .option),
+:deep(.ts-dropdown .option[data-empty]) {
+  background: rgba(10, 0, 32, 0.9) !important;
+  color: #c7d9ff !important;
+}
+
+/* Hover e seleção */
+:deep(.ts-dropdown .option:hover),
+:deep(.ts-dropdown .option.active) {
+  background: rgba(160, 32, 240, 0.25) !important;
+  color: #ffffff !important;
+}
+
+:deep(.ts-control input) {
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: #c7d9ff !important;
+}
+
+:deep(.ts-control) div {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:deep(.ts-wrapper) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:deep(.ts-wrapper.single .ts-control::before) {
+  background: transparent !important;
 }
 
 .btn-outline-danger.table-action-btn {
