@@ -14,12 +14,12 @@ const route = useRoute();
 
 // Função para aplicar ou remover a classe 'no-scroll' no body
 const updateBodyScroll = (routeName) => {
-  // Se a rota NÃO for 'Dashboard', adiciona a classe para remover o scroll.
-  if (routeName !== 'Dashboard') {
-    document.body.classList.add('no-scroll');
-  } else {
-    // Se for 'Dashboard', remove a classe para permitir o scroll.
+  const routesWithScroll = ['Register', 'Login', 'Dashboard'];
+
+  if (routesWithScroll.includes(routeName)) {
     document.body.classList.remove('no-scroll');
+  } else {
+    document.body.classList.add('no-scroll');
   }
 };
 

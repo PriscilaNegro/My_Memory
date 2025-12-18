@@ -146,6 +146,7 @@ const handleLogin = async () => {
     // assume padrão { data: { token: "..." } }
     if (response && response.data && response.data.token) {
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("name", response.data.user.name);
       // limpar form (opcional)
       form.email = "";
       form.password = "";

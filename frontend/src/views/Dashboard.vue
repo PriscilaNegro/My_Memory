@@ -33,8 +33,8 @@
       </select>
     </div>
 
-    <div class="main-wrapper d-flex justify-content-center">
-      <div class="container-fluid main-content">
+    <div class="main-wrapper">
+      <div class="main-content">
         <p class="main-subtitle mb-4 text-center">Esses são seus itens cadastrados:</p>
 
         <!-- Pesquisa DESKTOP -->
@@ -50,7 +50,7 @@
 
         <!-- Tabela filtrada -->
         <div v-if="filteredItems.length">
-          <div class="table-wrapper table-responsive">
+          <div class="table-wrapper">
             <table class="table table-hover table-bordered align-middle text-center mt-3">
               <thead class="custom-header">
                 <tr>
@@ -378,6 +378,11 @@ const confirmDeleteLocation = async () => {
 
 <style scoped>
 
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -468,22 +473,21 @@ const confirmDeleteLocation = async () => {
   position: relative;
   margin-top: 0px; 
   width: 100%;
-  display: flex;
-  justify-content: center;
+  justify-content: stretch;
 }
 
 .main-content {
   margin-top: 0 !important;
   margin-bottom: 50px;
-  background: rgba(10, 0, 32, 0.6);
-  backdrop-filter: blur(6px);
+  background:transparent;
+  backdrop-filter: none;
   padding: 25px;
   padding-top: 20px !important;
-  padding-right: 16px; 
+  padding-left: 0 !important;
+  padding-right: 0 !important;
   border-radius: 15px;
   width: 100%;
-  max-width: 1000px;
-  box-shadow: 0 0 25px rgba(160, 32, 240, 0.15);
+  max-width: 100%;
   color: #c7d9ff;
   flex: 1;
 }
@@ -492,17 +496,12 @@ const confirmDeleteLocation = async () => {
   overflow: visible !important;
   background: transparent;
   overflow: hidden;
+  width: 100%;
   color:  #c7d9ff;
 }
 
-.table-responsive {
-  overflow-y: visible !important;
-}
-
 .table thead th {
-  background: rgba(10, 0, 32, 0.55) !important;
-  color: #c7d9ff;
-  border-bottom: 2px solid #a020f0 !important;
+  background: rgba(20, 0, 40, 0.25)
 }
 
 .table tbody tr:hover {
@@ -522,13 +521,15 @@ const confirmDeleteLocation = async () => {
 }
 
 .table-hover tbody tr:hover td {
-  background: rgba(100, 28, 172, 0.5) !important;
+  background: rgba(144, 59, 229, 0.154) !important;
 }
 
 .table-wrapper {
-  max-height: 450px;  
+  width: 100%;
+  max-height: 450px;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table-wrapper thead th {
@@ -591,8 +592,8 @@ const confirmDeleteLocation = async () => {
 }
 
 .custom-header th {
-  background: rgba(85, 0, 170, 0.6) !important;
-  color: #fff !important;
+  background: rgba(0, 91, 141, 0.718) !important;
+  color: #fff ;
   font-weight: bold;
   text-shadow: 0 0 5px #a020f0;
 }
@@ -772,20 +773,15 @@ const confirmDeleteLocation = async () => {
 
 @media (max-width: 768px) {
 
-    html, body {
-    overflow: hidden !important;
-    height: 100%;
-  }
-
   .dashboard-content {
-    height: calc(100vh - 70px);
-    max-height: calc(100vh - 60px);
-    overflow: hidden !important;     
-    -webkit-overflow-scrolling: touch;
-    box-sizing: border-box;
-    padding-top: 20px;    
-    width: 100%;
-    max-width: 100%;      
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: 20px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin: 0 !important;
+    width: 100%;    
   }
 
   .top-actions {
@@ -816,19 +812,21 @@ const confirmDeleteLocation = async () => {
   }
 
   .main-content {
-    width: 98% !important;
-    max-width: none;
-    padding-left: 5px;
-    padding-right: 5px;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
 
   .main-wrapper {
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    max-width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
     max-height: 100vh;
-    overflow-x: hidden !important;
+    display: block !important;
   }
 
   .search-bar {
@@ -851,14 +849,13 @@ const confirmDeleteLocation = async () => {
   }
   
   .table-wrapper {
-    max-height: 450px; 
-    overflow-y: auto !important;    
-    overflow-x: hidden !important; 
-    -webkit-overflow-scrolling: touch;
-    width: 100% !important;
+  width: 100%;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  padding: 0px; 
   }
 
-  table {
+  .table{
     width: 100% !important;
   }
 
@@ -871,18 +868,5 @@ const confirmDeleteLocation = async () => {
     width: 100%;
     z-index: 100;
   }
-
-  .main-content .table {
-    table-layout: fixed; 
-    width: 100%;
-    word-wrap: break-word; 
-    white-space: normal;
-  }
- 
-  .main-content .table thead th:nth-child(1) { width: 20%; } /* Item */
-  .main-content .table thead th:nth-child(2) { width: 35%; } /* Local Armazenado */
-  .main-content .table thead th:nth-child(3) { width: 25%; } /* Data/Hora */
-  .main-content .table thead th:nth-child(4) { width: 20%; } 
-
 }
 </style>
