@@ -146,7 +146,7 @@ const handleRegister = async () => {
 
 <style scoped>
 .register-page {
-  height: 100vh;
+  min-height: 100vh;
   background: transparent;
   width: 100%;
   display: flex;
@@ -266,9 +266,9 @@ button {
 
 @media (max-width: 480px) {
   .register-page {
-    height: 100vh;      
+    min-height: 100svh;
+    overflow-y: auto;      
     padding-bottom: 20px; 
-    justify-content: flex-start;
     margin-top: 10vh; 
   }
 
@@ -291,5 +291,10 @@ button {
   }
 }
 
+@media (max-width: 768px) {
+  .register-container {
+    padding-bottom: 40px;
+  }
+}
 
 </style>
